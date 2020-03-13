@@ -8,8 +8,7 @@ dependencies/**/*.txt
 dependencies/**/*.dat
 dependencies/**/LA_*
 dependencies/**/*.MF
-./dependencies/recgen/*
-./dependencies/MicroFocus/*
+./dependencies/recgen/
 src/main/java/com/CommonData.java
 src/main/java/com/DecimalData.java
 src/main/java/com/PackedDecimal$PackedDecimalOperand.java
