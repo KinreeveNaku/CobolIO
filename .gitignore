@@ -1,0 +1,14 @@
+.settings
+target
+.classpath
+.project
+src/**/*.class
+dependencies/**/*.class
+dependencies/**/*.txt
+dependencies/**/*.dat
+dependencies/**/LA_*
+dependencies/**/*.MF
+src/main/java/com/CommonData.java
+src/main/java/com/DecimalData.java
+src/main/java/com/PackedDecimal$PackedDecimalOperand.java
+src/main/java/com/PackedDecimal.java
