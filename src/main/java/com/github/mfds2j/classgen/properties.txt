@@ -1,0 +1,15 @@
+${package}
+${imports} {
+	${import} {
+		${canonClassName}
+	}
+}
+${className}
+${properties} {
+	${property...} {
+		${fieldIndex}
+		${fieldName}
+		${fieldType}
+		${fieldValue}
+	}
+}

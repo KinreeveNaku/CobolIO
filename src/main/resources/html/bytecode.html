@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<title>Type support in the Java Virtual Machine instruction set</title>
+<style>
+th, tr, td {
+	border: thin double black;
+}
+
+td {
+	padding-left: 5px;
+}
+
+#header {
+	background-color: rgba(192, 192, 192, 0.75);
+}
+
+#bytecodeTable {
+	min-width: 50%;
+	width: 65%;
+	max-width: 75%;
+	float: left; background-color : rgba( 192, 192, 192, 0.15);
+	border: thin solid black;
+	background-color: rgba(192, 192, 192, 0.15);
+	background-color: rgba(192, 192, 192, 0.15);
+}
+
+#jvmTypesTable {
+	float: left;
+	min-width: 25%;
+	width: 35%;
+	max-width: 50%; background-color : rgba( 192, 192, 192, 0.15);
+	border: thin solid black;
+	background-color: rgba(192, 192, 192, 0.15);
+	background-color: rgba(192, 192, 192, 0.15);
+}
+</style>
+</head>
+<body>
+
+	<div>
+		<p>Most of the instructions in the Java Virtual Machine
+			instruction set encode type information about the operations they
+			perform. For instance, the iload instruction (§iload) loads the
+			contents of a local variable, which must be an int, onto the operand
+			stack. The fload instruction (§fload) does the same with a float
+			value. The two instructions may have identical implementations, but
+			have distinct opcodes.</p>
+
+		<p>For the majority of typed instructions, the instruction type is
+			represented explicitly in the opcode mnemonic by a letter: i for an
+			int operation, l for long, s for short, b for byte, c for char, f for
+			float, d for double, and a for reference. Some instructions for which
+			the type is unambiguous do not have a type letter in their mnemonic.
+			For instance, arraylength always operates on an object that is an
+			array. Some instructions, such as goto, an unconditional control
+			transfer, do not operate on typed operands.</p>
+
+		<p>Given the Java Virtual Machine's one-byte opcode size, encoding
+			types into opcodes places pressure on the design of its instruction
+			set. If each typed instruction supported all of the Java Virtual
+			Machine's run-time data types, there would be more instructions than
+			could be represented in a byte. Instead, the instruction set of the
+			Java Virtual Machine provides a reduced level of type support for
+			certain operations. In other words, the instruction set is
+			intentionally not orthogonal. Separate instructions can be used to
+			convert between unsupported and supported data types as necessary.</p>
+
+		<p>Table 2.11.1-A summarizes the type support in the instruction
+			set of the Java Virtual Machine. A specific instruction, with type
+			information, is built by replacing the T in the instruction template
+			in the opcode column by the letter in the type column. If the type
+			column for some instruction template and type is blank, then no
+			instruction exists supporting that type of operation. For instance,
+			there is a load instruction for type int, iload, but there is no load
+			instruction for type byte.</p>
+
+		<p>Note that most instructions in Table 2.11.1-A do not have forms
+			for the integral types byte, char, and short. None have forms for the
+			boolean type. A compiler encodes loads of literal values of types
+			byte and short using Java Virtual Machine instructions that
+			sign-extend those values to values of type int at compile-time or
+			run-time. Loads of literal values of types boolean and char are
+			encoded using instructions that zero-extend the literal to a value of
+			type int at compile-time or run-time. Likewise, loads from arrays of
+			values of type boolean, byte, short, and char are encoded using Java
+			Virtual Machine instructions that sign-extend or zero-extend the
+			values to values of type int. Thus, most operations on values of
+			actual types boolean, byte, char, and short are correctly performed
+			by instructions operating on values of computational type int.</p>
+	</div>
+	<div>
+		<table id="bytecodeTable"
+			title="Type support in the Java Virtual Machine instruction set">
+			<caption>Type support in the Java Virtual Machine
+				instruction set</caption>
+			<colgroup>
+				<col>
+				<col>
+				<col>
+				<col>
+				<col>
+				<col>
+				<col>
+				<col>
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th id="header">opcode</th>
+					<th id="header"><code class="literal">byte</code></th>
+					<th id="header"><code class="literal">short</code></th>
+					<th id="header"><code class="literal">int</code></th>
+					<th id="header"><code class="literal">long</code></th>
+					<th id="header"><code class="literal">float</code></th>
+					<th id="header"><code class="literal">double</code></th>
+					<th id="header"><code class="literal">char</code></th>
+					<th id="header"><code class="literal">reference</code></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><span class="emphasis"><em>Tipush</em></span></td>
+					<td><span class="emphasis"><em>bipush</em></span></td>
+					<td><span class="emphasis"><em>sipush</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tconst</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>iconst</em></span></td>
+					<td><span class="emphasis"><em>lconst</em></span></td>
+					<td><span class="emphasis"><em>fconst</em></span></td>
+					<td><span class="emphasis"><em>dconst</em></span></td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>aconst</em></span></td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tload</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>iload</em></span></td>
+					<td><span class="emphasis"><em>lload</em></span></td>
+					<td><span class="emphasis"><em>fload</em></span></td>
+					<td><span class="emphasis"><em>dload</em></span></td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>aload</em></span></td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tstore</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>istore</em></span></td>
+					<td><span class="emphasis"><em>lstore</em></span></td>
+					<td><span class="emphasis"><em>fstore</em></span></td>
+					<td><span class="emphasis"><em>dstore</em></span></td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>astore</em></span></td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tinc</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>iinc</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Taload</em></span></td>
+					<td><span class="emphasis"><em>baload</em></span></td>
+					<td><span class="emphasis"><em>saload</em></span></td>
+					<td><span class="emphasis"><em>iaload</em></span></td>
+					<td><span class="emphasis"><em>laload</em></span></td>
+					<td><span class="emphasis"><em>faload</em></span></td>
+					<td><span class="emphasis"><em>daload</em></span></td>
+					<td><span class="emphasis"><em>caload</em></span></td>
+					<td><span class="emphasis"><em>aaload</em></span></td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tastore</em></span></td>
+					<td><span class="emphasis"><em>bastore</em></span></td>
+					<td><span class="emphasis"><em>sastore</em></span></td>
+					<td><span class="emphasis"><em>iastore</em></span></td>
+					<td><span class="emphasis"><em>lastore</em></span></td>
+					<td><span class="emphasis"><em>fastore</em></span></td>
+					<td><span class="emphasis"><em>dastore</em></span></td>
+					<td><span class="emphasis"><em>castore</em></span></td>
+					<td><span class="emphasis"><em>aastore</em></span></td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tadd</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>iadd</em></span></td>
+					<td><span class="emphasis"><em>ladd</em></span></td>
+					<td><span class="emphasis"><em>fadd</em></span></td>
+					<td><span class="emphasis"><em>dadd</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tsub</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>isub</em></span></td>
+					<td><span class="emphasis"><em>lsub</em></span></td>
+					<td><span class="emphasis"><em>fsub</em></span></td>
+					<td><span class="emphasis"><em>dsub</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tmul</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>imul</em></span></td>
+					<td><span class="emphasis"><em>lmul</em></span></td>
+					<td><span class="emphasis"><em>fmul</em></span></td>
+					<td><span class="emphasis"><em>dmul</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tdiv</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>idiv</em></span></td>
+					<td><span class="emphasis"><em>ldiv</em></span></td>
+					<td><span class="emphasis"><em>fdiv</em></span></td>
+					<td><span class="emphasis"><em>ddiv</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Trem</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>irem</em></span></td>
+					<td><span class="emphasis"><em>lrem</em></span></td>
+					<td><span class="emphasis"><em>frem</em></span></td>
+					<td><span class="emphasis"><em>drem</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tneg</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>ineg</em></span></td>
+					<td><span class="emphasis"><em>lneg</em></span></td>
+					<td><span class="emphasis"><em>fneg</em></span></td>
+					<td><span class="emphasis"><em>dneg</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tshl</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>ishl</em></span></td>
+					<td><span class="emphasis"><em>lshl</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tshr</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>ishr</em></span></td>
+					<td><span class="emphasis"><em>lshr</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tushr</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>iushr</em></span></td>
+					<td><span class="emphasis"><em>lushr</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tand</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>iand</em></span></td>
+					<td><span class="emphasis"><em>land</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tor</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>ior</em></span></td>
+					<td><span class="emphasis"><em>lor</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Txor</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>ixor</em></span></td>
+					<td><span class="emphasis"><em>lxor</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>i2T</em></span></td>
+					<td><span class="emphasis"><em>i2b</em></span></td>
+					<td><span class="emphasis"><em>i2s</em></span></td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>i2l</em></span></td>
+					<td><span class="emphasis"><em>i2f</em></span></td>
+					<td><span class="emphasis"><em>i2d</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>l2T</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>l2i</em></span></td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>l2f</em></span></td>
+					<td><span class="emphasis"><em>l2d</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>f2T</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>f2i</em></span></td>
+					<td><span class="emphasis"><em>f2l</em></span></td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>f2d</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>d2T</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>d2i</em></span></td>
+					<td><span class="emphasis"><em>d2l</em></span></td>
+					<td><span class="emphasis"><em>d2f</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tcmp</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>lcmp</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tcmpl</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>fcmpl</em></span></td>
+					<td><span class="emphasis"><em>dcmpl</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Tcmpg</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>fcmpg</em></span></td>
+					<td><span class="emphasis"><em>dcmpg</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>if_TcmpOP</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>if_icmpOP</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>if_acmpOP</em></span></td>
+				</tr>
+				<tr>
+					<td><span class="emphasis"><em>Treturn</em></span></td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>ireturn</em></span></td>
+					<td><span class="emphasis"><em>lreturn</em></span></td>
+					<td><span class="emphasis"><em>freturn</em></span></td>
+					<td><span class="emphasis"><em>dreturn</em></span></td>
+					<td>&nbsp;</td>
+					<td><span class="emphasis"><em>areturn</em></span></td>
+				</tr>
+			</tbody>
+		</table>
+		<table id="jvmTypesTable" border="1">
+			<caption>Actual and Computational types in the Java Virtual
+				Machine</caption>
+			<colgroup>
+				<col>
+				<col>
+				<col>
+			</colgroup>
+			<thead>
+				<tr>
+					<th>Actual type</th>
+					<th>Computational type</th>
+					<th>Category</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><code class="literal">boolean</code></td>
+					<td><code class="literal">int</code></td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td><code class="literal">byte</code></td>
+					<td><code class="literal">int</code></td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td><code class="literal">char</code></td>
+					<td><code class="literal">int</code></td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td><code class="literal">short</code></td>
+					<td><code class="literal">int</code></td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td><code class="literal">int</code></td>
+					<td><code class="literal">int</code></td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td><code class="literal">float</code></td>
+					<td><code class="literal">float</code></td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td><code class="literal">reference</code></td>
+					<td><code class="literal">reference</code></td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td><code class="literal">returnAddress</code></td>
+					<td><code class="literal">returnAddress</code></td>
+					<td>1</td>
+				</tr>
+				<tr>
+					<td><code class="literal">long</code></td>
+					<td><code class="literal">long</code></td>
+					<td>2</td>
+				</tr>
+				<tr>
+					<td><code class="literal">double</code></td>
+					<td><code class="literal">double</code></td>
+					<td>2</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>

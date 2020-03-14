@@ -1,0 +1,350 @@
+package ${package};
+
+import com.github.mfds2j.classgen.IVirtual;
+#foreach($import in $imports)
+import ${import.canonClassName};
+#end
+#foreach ($annotation in $this.javaAnnotations($schema))
+@$annotation
+#end
+public class ${className} implements com.classgen.IVirtual {
+	#foreach($property in $properties)
+		protected ${property.fieldType} ${property.fieldName};
+	#end
+	public ${className}() {
+		
+	}
+	
+	@Override
+	java.lang.Object[] getAll() {
+		
+	}
+	
+	#*
+	This returns the type of the field at index <code>index</code>.
+	@return Returns the runtime type of the field at this index.
+	*#
+	@Override
+	public java.lang.Class<?> getTypeOf(int index) {
+		switch(index) {
+		#foreach($property in $properties)
+		case ${property.index} : {
+			return ${property.fieldType};
+		}
+		#end
+		default :
+			throw new java.lang.IllegalArgumentException("Bad index of " + index);
+		}
+	}
+	
+	#*
+	This method returns the value of the field at index <code>index</code>.
+	@return Returns the value of the field at this index.
+		
+	*#
+	@Override
+	public java.lang.Object get(int index) {
+		switch(index) {
+		#foreach($property in $properties) {
+		case ${property.index} : {
+			return ${property.fieldName};
+		}
+		}
+		}
+	}
+	
+	#foreach($property in $properties)
+	#*
+		Returns the value of ${property.fieldName}.
+	*#
+	public ${property.fieldType} get${property.getterName}() {
+		return return this.${property.fieldName};
+	}
+	#end
+	
+	#foreach($property in $properties)
+	#*
+		Sets the value of ${property.fieldName} to <code>${property.getFieldName}</code>.
+	*#
+		#if($property.isArray)
+	public void set${property.getSetName}(${property.getFieldType}[] ${property.getFieldName}) {
+		this.${property.getFieldName} = ${property.getFieldName};
+	}
+		#else
+	public void set${property.getSetName}(${property.getFieldType} ${property.getFieldName}) {
+		this.${property.getFieldName} = ${property.getFieldName};
+	}
+		#end
+	#end
+	
+	#*
+		Returns the record in raw String format.
+		This method is to be primarily used by facilities that
+		wish to do their own custom handling of the record strings
+		in post operation.
+		
+		All child types must override {@link java.lang.Object#toString toString()}
+		to follow the contract required by mfds2j.
+		@implNote This method should not be called excessively, especially when records are longer,
+		 as this method can be potentially performance heavy. The best approach would be to call
+		 this once and refer back to the returned value when it needs to be referred to again.
+		 Needs cleaner syntax.
+	*#
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		#foreach($property in $properties)
+			#if(${property.isArray})
+			builder.append(Arrays.deepToString(${property.fieldName}));
+			#else
+			builder.append(String.valueOf(${property.fieldName}));
+			#end
+		#end
+	}
+
+#macro( encodeVar $indent $var $s )
+#set ($I = $this.indent($indent))
+##### Compound types (array, map, and union) require calls
+##### that will recurse back into this encodeVar macro:
+#if ($s.Type.Name.equals("array"))
+#encodeArray($indent $var $s)
+#elseif ($s.Type.Name.equals("map"))
+#encodeMap($indent $var $s)
+#elseif ($s.Type.Name.equals("union"))
+#encodeUnion($indent $var $s)
+##### Use the generated "encode" method as fast way to write
+##### (specific) record types:
+#elseif ($s.Type.Name.equals("record"))
+$I    ${var}.customEncode(out);
+##### For rest of cases, generate calls out.writeXYZ:
+#elseif ($s.Type.Name.equals("null"))
+$I    out.writeNull();
+#elseif ($s.Type.Name.equals("boolean"))
+$I    out.writeBoolean(${var});
+#elseif ($s.Type.Name.equals("int"))
+$I    out.writeInt(${var});
+#elseif ($s.Type.Name.equals("long"))
+$I    out.writeLong(${var});
+#elseif ($s.Type.Name.equals("float"))
+$I    out.writeFloat(${var});
+#elseif ($s.Type.Name.equals("double"))
+$I    out.writeDouble(${var});
+#elseif ($s.Type.Name.equals("string"))
+#if ($this.isStringable($s))
+$I    out.writeString(${var}.toString());
+#else
+$I    out.writeString(${var});
+#end
+#elseif ($s.Type.Name.equals("bytes"))
+$I    out.writeBytes(${var});
+#elseif ($s.Type.Name.equals("fixed"))
+$I    out.writeFixed(${var}.bytes(), 0, ${s.FixedSize});
+#elseif ($s.Type.Name.equals("enum"))
+$I    out.writeEnum(${var}.ordinal());
+#else
+## TODO -- singal a code-gen-time error
+#end
+#end
+
+#macro( encodeArray $indent $var $s )
+#set ($I = $this.indent($indent))
+#set ($et = $this.javaType($s.ElementType))
+$I    long size${nv} = ${var}.size();
+$I    out.writeArrayStart();
+$I    out.setItemCount(size${nv});
+$I    long actualSize${nv} = 0;
+$I    for ($et e${nv}: ${var}) {
+$I      actualSize${nv}++;
+$I      out.startItem();
+#set ($var = "e${nv}")
+#set ($nv = $nv + 1)
+#set ($maxnv = $nv)
+#set ($indent = $indent + 2)
+#encodeVar($indent $var $s.ElementType)
+#set ($nv = $nv - 1)
+#set ($indent = $indent - 2)
+#set ($I = $this.indent($indent))
+$I    }
+$I    out.writeArrayEnd();
+$I    if (actualSize${nv} != size${nv})
+$I      throw new java.util.ConcurrentModificationException("Array-size written was " + size${nv} + ", but element count was " + actualSize${nv} + ".");
+#end
+
+#macro( encodeMap $indent $var $s )
+#set ($I = $this.indent($indent))
+#set ($kt = $this.getStringType($s))
+#set ($vt = $this.javaType($s.ValueType))
+$I    long size${nv} = ${var}.size();
+$I    out.writeMapStart();
+$I    out.setItemCount(size${nv});
+$I    long actualSize${nv} = 0;
+$I    for (java.util.Map.Entry<$kt, $vt> e${nv}: ${var}.entrySet()) {
+$I      actualSize${nv}++;
+$I      out.startItem();
+#if ($this.isStringable($s))
+$I      out.writeString(e${nv}.getKey().toString());
+#else
+$I      out.writeString(e${nv}.getKey());
+#end
+$I      $vt v${nv} = e${nv}.getValue();
+#set ($var = "v${nv}")
+#set ($nv = $nv + 1)
+#set ($maxnv = $nv)
+#set ($indent = $indent + 2)
+#encodeVar($indent $var $s.ValueType)
+#set ($nv = $nv - 1)
+#set ($indent = $indent - 2)
+#set ($I = $this.indent($indent))
+$I    }
+$I    out.writeMapEnd();
+$I    if (actualSize${nv} != size${nv})
+      throw new java.util.ConcurrentModificationException("Map-size written was " + size${nv} + ", but element count was " + actualSize${nv} + ".");
+#end
+
+#macro( encodeUnion $indent $var $s )
+#set ($I = $this.indent($indent))
+#set ($et = $this.javaType($s.Types.get($this.getNonNullIndex($s))))
+$I    if (${var} == null) {
+$I      out.writeIndex(#if($this.getNonNullIndex($s)==0)1#{else}0#end);
+$I      out.writeNull();
+$I    } else {
+$I      out.writeIndex(${this.getNonNullIndex($s)});
+#set ($indent = $indent + 2)
+#encodeVar($indent $var $s.Types.get($this.getNonNullIndex($s)))
+#set ($indent = $indent - 2)
+#set ($I = $this.indent($indent))
+$I    }
+#end
+
+
+#macro( decodeVar $indent $var $s $rs )
+#set ($I = $this.indent($indent))
+##### Compound types (array, map, and union) require calls
+##### that will recurse back into this decodeVar macro:
+#if ($s.Type.Name.equals("array"))
+#decodeArray($indent $var $s $rs)
+#elseif ($s.Type.Name.equals("map"))
+#decodeMap($indent $var $s $rs)
+#elseif ($s.Type.Name.equals("union"))
+#decodeUnion($indent $var $s $rs)
+##### Use the generated "decode" method as fast way to write
+##### (specific) record types:
+#elseif ($s.Type.Name.equals("record"))
+$I    if (${var} == null) {
+$I      ${var} = new ${this.javaType($s)}();
+$I    }
+$I    ${var}.customDecode(in);
+##### For rest of cases, generate calls in.readXYZ:
+#elseif ($s.Type.Name.equals("null"))
+$I    in.readNull();
+#elseif ($s.Type.Name.equals("boolean"))
+$I    $var = in.readBoolean();
+#elseif ($s.Type.Name.equals("int"))
+$I    $var = in.readInt();
+#elseif ($s.Type.Name.equals("long"))
+$I    $var = in.readLong();
+#elseif ($s.Type.Name.equals("float"))
+$I    $var = in.readFloat();
+#elseif ($s.Type.Name.equals("double"))
+$I    $var = in.readDouble();
+#elseif ($s.Type.Name.equals("string"))
+#decodeString( "$I" $var $s )
+#elseif ($s.Type.Name.equals("bytes"))
+$I    $var = in.readBytes(${var});
+#elseif ($s.Type.Name.equals("fixed"))
+$I    if (${var} == null) {
+$I      ${var} = new ${this.javaType($s)}();
+$I    }
+$I    in.readFixed(${var}.bytes(), 0, ${s.FixedSize});
+#elseif ($s.Type.Name.equals("enum"))
+$I    $var = ${this.javaType($s)}.values()[in.readEnum()];
+#else
+## TODO -- singal a code-gen-time error
+#end
+#end
+
+#macro( decodeString $II $var $s )
+#set ($st = ${this.getStringType($s)})
+#if ($this.isStringable($s))
+$II    ${var} = new ${st}(in.readString());
+#elseif ($st.equals("java.lang.String"))
+$II    $var = in.readString();
+#elseif ($st.equals("org.apache.avro.util.Utf8"))
+$II    $var = in.readString(${var});
+#else
+$II    $var = in.readString(${var} instanceof Utf8 ? (Utf8)${var} : null);
+#end
+#end
+
+#macro( decodeArray $indent $var $s $rs )
+#set ($I = $this.indent($indent))
+#set ($t = $this.javaType($s))
+#set ($et = $this.javaType($s.ElementType))
+#set ($gat = "SpecificData.Array<${et}>")
+$I    long size${nv} = in.readArrayStart();
+## Need fresh variable name due to limitation of macro system
+$I    $t a${nv} = ${var};
+$I    if (a${nv} == null) {
+$I      a${nv} = new ${gat}((int)size${nv}, ${rs});
+$I      $var = a${nv};
+$I    } else a${nv}.clear();
+$I    $gat ga${nv} = (a${nv} instanceof SpecificData.Array ? (${gat})a${nv} : null);
+$I    for ( ; 0 < size${nv}; size${nv} = in.arrayNext()) {
+$I      for ( ; size${nv} != 0; size${nv}--) {
+$I        $et e${nv} = (ga${nv} != null ? ga${nv}.peek() : null);
+#set ($var = "e${nv}")
+#set ($nv = $nv + 1)
+#set ($maxnv = $nv)
+#set ($indent = $indent + 4)
+#decodeVar($indent $var $s.ElementType "${rs}.getElementType()")
+#set ($nv = $nv - 1)
+#set ($indent = $indent - 4)
+#set ($I = $this.indent($indent))
+$I        a${nv}.add(e${nv});
+$I      }
+$I    }
+#end
+
+#macro( decodeMap $indent $var $s $rs )
+#set ($I = $this.indent($indent))
+#set ($t = $this.javaType($s))
+#set ($kt = $this.getStringType($s))
+#set ($vt = $this.javaType($s.ValueType))
+$I    long size${nv} = in.readMapStart();
+$I    $t m${nv} = ${var}; // Need fresh name due to limitation of macro system
+$I    if (m${nv} == null) {
+$I      m${nv} = new java.util.HashMap<${kt},${vt}>((int)size${nv});
+$I      $var = m${nv};
+$I    } else m${nv}.clear();
+$I    for ( ; 0 < size${nv}; size${nv} = in.mapNext()) {
+$I      for ( ; size${nv} != 0; size${nv}--) {
+$I        $kt k${nv} = null;
+#decodeString( "$I    " "k${nv}" $s )
+$I        $vt v${nv} = null;
+#set ($var = "v${nv}")
+#set ($nv = $nv + 1)
+#set ($maxnv = $nv)
+#set ($indent = $indent + 4)
+#decodeVar($indent $var $s.ValueType "${rs}.getValueType()")
+#set ($nv = $nv - 1)
+#set ($indent = $indent - 4)
+#set ($I = $this.indent($indent))
+$I        m${nv}.put(k${nv}, v${nv});
+$I      }
+$I    }
+#end
+
+#macro( decodeUnion $indent $var $s $rs )
+#set ($I = $this.indent($indent))
+#set ($et = $this.javaType($s.Types.get($this.getNonNullIndex($s))))
+#set ($si = $this.getNonNullIndex($s))
+$I    if (in.readIndex() != ${si}) {
+$I      in.readNull();
+$I      ${var} = null;
+$I    } else {
+#set ($indent = $indent + 2)
+#decodeVar($indent $var $s.Types.get($si) "${rs}.getTypes().get(${si})")
+#set ($indent = $indent - 2)
+#set ($I = $this.indent($indent))
+$I    }
+#end

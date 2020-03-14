@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github.mfds2j</groupId>
+	<artifactId>mfds2j</artifactId>
+	<version>0.0.9-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>Mainframe Dataset to Java</name>
+	<description></description>
+	<url />
+	<inceptionYear>2020</inceptionYear>
+	<organization>
+		<name>uhhh...</name>
+	</organization>
+	<licenses>
+		<license>
+			<name>Apache License 2.0</name>
+			<url>http://www.spdx.org/licenses/Apache-2.0</url>
+		</license>
+		<license>
+			<name>Apple Public Source License 2.0</name>
+			<url>http://www.spdx.org/licenses/APSL-2.0</url>
+		</license>
+		<license>
+			<name>Personal Opinion License(Made up)</name>
+			<comments>
+				Personally, I don't care what you do with it.
+				Use parts of the code in other projects, include it your own projects, or even make a fork of it and add
+				onto it, and I'll consider adding you as a contributor.
+				I just want to be mentioned somewhere so others know I was here and that I did my best ^^;.
+				Oh and let me know how this helps you, should you get the chance.
+				I've put a lot of work into this and want to know about the developers that it helps.
+			</comments>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<id>Kinreeve</id>
+			<name>Kinreeve Naku</name>
+			<roles>
+				<role>Chimp</role>
+				<role>Developer</role>
+				<role>Owner</role>
+			</roles>
+			<properties>
+				<CanDivideByZero>true</CanDivideByZero>
+			</properties>
+		</developer>
+	</developers>
+	<contributors>
+		<contributor>
+			<name>Clorifex</name>
+			<roles>
+				<role>Oracle of knowledge and experience</role>
+			</roles>
+		</contributor>
+	</contributors>
+	<mailingLists>
+
+	</mailingLists>
+	<prerequisites>
+
+	</prerequisites>
+	<modules />
+	<scm>
+		<connection></connection>
+		<developerConnection></developerConnection>
+		<url></url>
+	</scm>
+	<issueManagement>
+
+	</issueManagement>
+	<ciManagement>
+
+	</ciManagement>
+	<distributionManagement>
+
+	</distributionManagement>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+	</properties>
+	<dependencyManagement />
+
+	<dependencies><!-- 
+		<dependency>
+			<groupId>com.igormaznitsa</groupId>
+			<artifactId>jbbp</artifactId>
+			<version>2.0.1</version>
+		</dependency> -->
+		<dependency>
+			<groupId>org.apache.avro</groupId>
+			<artifactId>avro</artifactId>
+			<version>1.9.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- <dependency>
+			<groupId>org.apache.avro</groupId>
+			<artifactId>avro-tools</artifactId>
+			<version>1.9.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-http</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-io</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-servlet</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-security</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-util</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-server</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.apache.velocity</groupId>
+					<artifactId>velocity-engine-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency> -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>5.1.5.RELEASE</version>
+		</dependency>
+		<!-- ByteCode Manipulation Utilities -->
+		<dependency>
+			<groupId>org.apache.velocity.tools</groupId>
+			<artifactId>velocity-tools-generic</artifactId>
+			<version>3.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity-engine-core</artifactId>
+			<version>2.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.javassist</groupId>
+			<artifactId>javassist</artifactId>
+			<version>3.26.0-GA</version>
+		</dependency>
+		<!-- Serialization, Deserialization, and Transformation -->
+		<dependency>
+			<groupId>org.beanio</groupId>
+			<artifactId>beanio</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.dozer</groupId>
+			<artifactId>dozer</artifactId>
+			<version>5.4.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>xalan</groupId>
+			<artifactId>xalan</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/xerces/xercesImpl -->
+		<dependency>
+			<groupId>xerces</groupId>
+			<artifactId>xercesImpl</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>1.3.04</version>
+		</dependency>
+		<!-- Logging -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+	</dependencies>
+	<repositories>
+		<!-- <repository> <id>MFDS2J</id> <url/> <releases> <enabled>true</enabled> 
+			</releases> <snapshots> <enabled>false</enabled> </snapshots> </repository> 
+			<repository> <id>MFDS2J-SNAPSHOT</id> <url/> <releases> <enabled>false</enabled> 
+			</releases> <snapshots> <enabled>true</enabled> </snapshots> </repository> -->
+	</repositories>
+	<pluginRepositories />
+	<build>
+		<finalName>${artifactId}-{version}</finalName>
+		<filters>
+			<filter>src/main/resources/filter.properties</filter>
+		</filters>
+	</build>
+	<reporting></reporting>
+	<profiles></profiles>
+</project>
