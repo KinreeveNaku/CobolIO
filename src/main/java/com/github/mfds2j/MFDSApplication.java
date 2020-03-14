@@ -3,6 +3,8 @@
  */
 package com.github.mfds2j;
 
+import javax.annotation.Resource;
+
 import org.slf4j.LoggerFactory;
 
 import ch.qos.logback.classic.Logger;
@@ -12,6 +14,7 @@ import ch.qos.logback.classic.Logger;
  * @author Andrew
  *
  */
+@Resource(name = "ApplicationLauncher")
 public class MFDSApplication {
 	private static final Logger ROOT = (Logger) LoggerFactory.getLogger(MFDSApplication.class);
 	public static void main(String[] args) {

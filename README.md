@@ -2,7 +2,7 @@
 <html>
 <head>
 <style>
-div.h1.indented {
+div.indented {
 	margin-left: 10%;
 	margin-right: 10%;
 }
