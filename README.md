@@ -28,9 +28,13 @@ div.indented {
 					received much consideration, but, again, the flexibility for type
 					handling configuration was lacking. An idea came to mind of taking
 					the approach that Jackson and BeanIO make use of, and simply create
-					an extensible wrapper for the language in question, in this case,
-					Cobol.</p>
-	
+					an extensible wrapper for the language.</p>
+				<p>Will contain an expression language for configuring field patterns which
+					should be handled in theirown way, such as joining, or custom
+					reformatting.
+					For example, two fields at the same level where the first is a sign
+					character and the second is a numeric field. The configurations could
+					be configured to always join this pattern into a signed numeric.
 			</div>
 	
 		</div>
