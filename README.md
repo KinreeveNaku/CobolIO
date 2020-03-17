@@ -56,8 +56,6 @@ div.indented {
 			</div>
 		</div>
 	</section>
-	<br></br>
-	<section>
 		<pre>
 			
 			Copyright 2020 the original author or authors.
@@ -75,6 +73,5 @@ div.indented {
 			limitations under the License.
 			
 		</pre>
-	</section>
 </body>
 </html>
