@@ -36,9 +36,6 @@ div.indented {
 					character and the second is a numeric field. The configurations could
 					be configured to always join this pattern into a signed numeric.
 			</div>
-	
-		</div>
-		<div>
 			<h3>Developer Notes</h3>
 			<img src="./src/main/resources/img/Clorifex.png" longdesc="" alt="" />
 			<br /> <sub>Clorifex strongly recommended using class
