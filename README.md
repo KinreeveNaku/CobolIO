@@ -37,7 +37,7 @@ div.indented {
 					pattern into a signed numeric.
 			</div>
 			<h3>Developer Notes</h3>
-			<img src="./src/main/resources/img/Clorifex.png" longdesc="" alt="" />
+			<img src="./src/main/resources/img/Clorifex.PNG" longdesc="" alt="" />
 			<br /> <sub>Clorifex strongly recommended using class
 				generation as the templating functionality for translating the
 				copybook xml definitions to java containers, so the decision was
