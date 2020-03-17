@@ -38,8 +38,7 @@ div.indented {
 			</div>
 	
 		</div>
-
-		<div style="width: 20%; margin-top: -2%;">
+		<div>
 			<h3>Developer Notes</h3>
 			<img src="./src/main/resources/img/Clorifex.png" longdesc="" alt="" />
 			<br /> <sub>Clorifex strongly recommended using class
