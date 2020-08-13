@@ -8,5 +8,5 @@ package com.github.mfds2j.classgen;
  *
  */
 public class VirtualBuilder {
-
+	VirtualCompiler compiler;
 }

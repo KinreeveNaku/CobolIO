@@ -4,12 +4,15 @@
 package com.github.mfds2j.classgen;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
 
 import org.apache.avro.generic.GenericData.StringType;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
 import com.github.mfds2j.classgen.registry.Conversion;
+
+import net.sf.cb2xml.jaxb.Copybook;
 
 /**
  * @author Andrew
@@ -29,6 +32,7 @@ public class VirtualCompiler {
 	private StringType stringType;
 	private VelocityEngine velocityEngine;
 	private VirtualData virtualData;
+	private Copybook copybook;
 
 	VirtualCompiler() {
 		this.context = new VelocityContext();
@@ -59,9 +63,14 @@ public class VirtualCompiler {
 	}
 
 	public void initializeContext() {
-
+		
 	}
-
+	
+	public void compile() {
+		this.context.put("", this.createAllArgsConstructor);
+		this.context.put("", this.copybook);
+	}
+	
 	public void setTemplateDir(String templateDir) {
 		this.templateDir = templateDir;
 	}
@@ -69,7 +78,7 @@ public class VirtualCompiler {
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
 	}
-
+	
 	public boolean isDeprecatedFields() {
 		return this.fieldVisibility == FieldVisibility.PUBLIC_DEPRECATED;
 	}
@@ -154,7 +163,12 @@ public class VirtualCompiler {
 			throw new RuntimeException("Failed to instantiate conversion class " + conversionClass, var3);
 		}
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	public void setCopybook(Copybook cpy) {
+		this.copybook = cpy;
+	}
+	
 	public enum StringType {
 		CharSequence, String, Utf8
 	};

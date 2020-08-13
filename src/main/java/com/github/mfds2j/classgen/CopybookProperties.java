@@ -13,7 +13,7 @@ public class CopybookProperties {
 	 * 
 	 */
 	public CopybookProperties() {
-		// TODO Auto-generated constructor stub
+		// TODO
 	}
 
 }

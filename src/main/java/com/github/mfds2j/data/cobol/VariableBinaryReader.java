@@ -26,7 +26,7 @@ public class VariableBinaryReader extends AbstractBinaryReader {
 
 	@Override
 	public String readRecord() {
-		// TODO Auto-generated method stub
+		// TODO Write up logic
 		return null;
 	}
 	
