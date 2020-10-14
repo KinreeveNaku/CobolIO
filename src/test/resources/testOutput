@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<copybook filename="MASTER_REC" dialect="Mainframe">
+    <item display-length="43" level="01" name="MASTER_REC" position="1" storage-length="37" can-concatenate="false">
+        <item display-length="9" level="05" name="ACCOUNT_NO" picture="X(9)" position="1" storage-length="9" can-concatenate="false"/>
+        <item display-length="1" level="05" name="REC_TYPE" picture="X" position="10" storage-length="1" can-concatenate="false"/>
+        <item display-length="6" level="05" name="AMOUNT" numeric="true" picture="S9(4)V99" position="11" scale="2" signed="true" storage-length="4" usage="computational-3" can-concatenate="false"/>
+        <item display-length="8" level="05" name="BIN-NO" numeric="true" picture="S9(8)" position="15" redefined="true" signed="true" storage-length="4" usage="computational" can-concatenate="false"/>
+        <item display-length="4" level="05" name="BIN-NO-X" picture="XXXX" position="15" redefines="BIN-NO" storage-length="4" can-concatenate="false"/>
+        <item display-length="3" level="05" name="DECIMAL-NO" numeric="true" picture="S999" position="19" signed="true" storage-length="3" can-concatenate="false"/>
+        <item display-length="6" level="05" name="MASTER-DATE" position="22" redefined="true" storage-length="6" can-concatenate="false">
+            <item display-length="2" level="10" name="DATE-YY" numeric="true" picture="9(2)" position="22" storage-length="2" can-concatenate="false"/>
+            <item display-length="2" level="10" name="DATE-MM" numeric="true" picture="9(2)" position="24" storage-length="2" can-concatenate="false"/>
+            <item display-length="2" level="10" name="DATE-DD" numeric="true" picture="9(2)" position="26" storage-length="2" can-concatenate="false"/>
+        </item>
+        <item display-length="6" level="05" name="MASTER-DOB" position="22" redefines="MASTER-DATE" storage-length="6" can-concatenate="false">
+            <item display-length="6" level="10" name="YYMMDD" picture="XXXXXX" position="22" storage-length="6" can-concatenate="false"/>
+        </item>
+        <item display-length="1" level="05" name="ACT_TYPE" picture="X" position="28" storage-length="1" can-concatenate="false"/>
+        <item display-length="6" level="05" name="OTHER-DATE" position="29" redefined="true" storage-length="6" can-concatenate="false">
+            <item display-length="2" level="10" name="ODATE-YY" numeric="true" picture="9(2)" position="29" storage-length="2" can-concatenate="false"/>
+            <item display-length="2" level="10" name="ODATE-MM" numeric="true" picture="9(2)" position="31" storage-length="2" can-concatenate="false"/>
+            <item display-length="2" level="10" name="ODATE-DD" numeric="true" picture="9(2)" position="33" storage-length="2" can-concatenate="false"/>
+        </item>
+        <item display-length="8" level="05" name="OTHER-DOB" position="29" redefines="OTHER-DATE" storage-length="8" can-concatenate="false">
+            <item display-length="8" level="10" name="OYYMMDDTT" numeric="true" picture="9(8)" position="29" storage-length="8" can-concatenate="false"/>
+        </item>
+        <item display-length="1" level="05" name="OTHER_TYPE" picture="X" position="37" storage-length="1" can-concatenate="false"/>
+    </item>
+    <item display-length="1" level="01" name="OTHER_REC" picture="X" position="38" storage-length="1" can-concatenate="false"/>
+</copybook>

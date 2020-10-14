@@ -65,6 +65,14 @@ public final class ByteUtils {
 		}
 	}
 	
+	public static byte[] longToBytes(long l) {
+	    byte[] result = new byte[8];
+	    for (int i = 7; i >= 0; i--) {
+	        result[i] = (byte)(l & 0xFF);
+	        l >>= 8;
+	    }
+	    return result;
+	}
 	
 	public static byte getHighNibble(byte b) {
 		return (byte) (b & PrimitiveConstants.HIGH_NIBBLE_MASK);

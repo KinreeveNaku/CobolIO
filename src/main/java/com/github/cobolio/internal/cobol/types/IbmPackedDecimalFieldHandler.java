@@ -3,23 +3,39 @@
  */
 package com.github.cobolio.internal.cobol.types;
 
-import static com.github.mfds2j.data.cobol.cobol.PrimitiveConstants.*;
+import static com.github.cobolio.internal.cobol.PrimitiveConstants.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import com.DecimalData;
+import com.PackedDecimal;
+import com.github.cobolio.internal.util.Messages;
+import com.github.cobolio.types.TypeConversionException;
+import com.github.cobolio.types.TypeHandler;
+
 /**
+ * An implementation of TypeHandler explicitly for handling packed decimal
+ * fields. Information such as the field's precision, scale, and offset must be
+ * provided during initialization.
+ * 
  * @author Andrew
  *
  */
 @SuppressWarnings("unused")
-public class IbmPackedDecimalFieldHandler {
+public class IbmPackedDecimalFieldHandler implements TypeHandler {
+	public static final byte PACKED_ZERO = 0;
+	public static final byte PACKED_SIGNED_ZERO = 12;
+	public static final byte PACKED_PLUS = 12;
+	public static final byte PACKED_MINUS = 13;
+	
 	private static final byte A = 0x0A;
 	private static final byte B = 0x0B;
 	private static final byte C = 0x0C;
 	private static final byte D = 0x0D;
 	private static final byte E = 0x0E;
 	private static final byte F = 0x0F;
+	
 	private static final int PACKED_BYTES_LENGTH = 33;
 
 	private static final byte HIGH_NIBBLE_MASK = (byte) 240;
@@ -27,17 +43,25 @@ public class IbmPackedDecimalFieldHandler {
 	private static final byte POSITIVE_MASK = 127;
 
 	private final int offset;
+	private final int precision;
+	private final int scale;
+	private final boolean showSign;
+	private final int byteLength;
 
-	public IbmPackedDecimalFieldHandler() {
-		this.offset = 0;
+	public IbmPackedDecimalFieldHandler(int offset, int precision, int scale) {
+		this.offset = offset;
+		this.precision = precision;
+		this.scale = scale;
+		this.showSign = false;
+		this.byteLength = PackedDecimal.precisionToByteLength(precision);
 	}
 
-	/**
-	 * 
-	 */
-
-	public IbmPackedDecimalFieldHandler(int offset) {
+	public IbmPackedDecimalFieldHandler(int offset, int precision, int scale, boolean showSign) {
 		this.offset = offset;
+		this.precision = precision;
+		this.scale = scale;
+		this.showSign = showSign;
+		this.byteLength = PackedDecimal.precisionToByteLength(precision);
 	}
 
 	@SuppressWarnings({ "java:S109", "java:S3358", "java:S3776" })
@@ -141,7 +165,6 @@ public class IbmPackedDecimalFieldHandler {
 			}
 			int i;
 			for (i = offset; i < signOffset && byteArray[i] == 0; ++i) {
-				;
 			}
 			while (i < signOffset) {
 				if ((byteArray[i] & LOW_NIBBLE_MASK) > LOW_NINE
@@ -194,39 +217,7 @@ public class IbmPackedDecimalFieldHandler {
 
 	}
 
-	private static boolean isExternalDecimalSignNegative(byte[] externalDecimal, int externalOffset, int precision,
-			int decimalType) {
-		byte signByte;
-		switch (decimalType) {
-		case 1:
-			signByte = (byte) (externalDecimal[externalOffset + precision - 1] & HIGH_NIBBLE_MASK);
-			if (signByte == -48 || signByte == -80) {
-				return true;
-			}
-			break;
-		case TWO:
-			signByte = (byte) (externalDecimal[externalOffset] & HIGH_NIBBLE_MASK);
-			if (signByte == -48 || signByte == -80) {
-				return true;
-			}
-			break;
-		case 3:
-			signByte = externalDecimal[externalOffset + precision];
-			if (signByte == 96) {
-				return true;
-			}
-			break;
-		case 4:
-			signByte = externalDecimal[externalOffset];
-			if (signByte == 96) {
-				return true;
-			}
-			break;
-		default:
-			throw new IllegalArgumentException("Invalid decimal sign type.");
-		}
-		return false;
-	}
+	
 
 	public static int precisionToByteLength(int precision) {
 		return (precision + TWO) / TWO;
@@ -242,6 +233,36 @@ public class IbmPackedDecimalFieldHandler {
 
 	public static int sign(byte b) {
 		return getSign(b & LOW_NIBBLE_MASK) == D ? -1 : 1;
+	}
+
+	@Override
+	public Object parse(byte[] text) throws TypeConversionException {
+		if (checkPackedDecimal(text, offset, precision) == TWO) {
+			return packedToBigDecimal(text, scale, precision);
+		} else {
+			throw new TypeConversionException("Conversion failed. Contents do not represent a packed decimal.");
+		}
+	}
+
+	@SuppressWarnings("deprecation")
+	@Override
+	public byte[] format(Object value) {
+		byte[] packed = new byte[byteLength];
+		if (value instanceof BigDecimal) {
+			DecimalData.convertBigDecimalToPackedDecimal((BigDecimal)value, packed, 0, precision, true);
+		} else if (value instanceof BigInteger) { 
+			DecimalData.convertBigIntegerToPackedDecimal((BigInteger)value, packed, 0, precision, true);
+		} else if (value instanceof String) {
+			DecimalData.convertBigDecimalToPackedDecimal(new BigDecimal((String)value), packed, 0, precision, true);
+		} else {
+			throw new IllegalStateException(Messages.getString("com.github.cobolio.internal.cobol.types.IbmPackedDecimalFieldHandler.IllegalState"));
+		}
+		return packed;
+	}
+
+	@Override
+	public Class<?> getType() {
+		return this.getClass();
 	}
 
 }

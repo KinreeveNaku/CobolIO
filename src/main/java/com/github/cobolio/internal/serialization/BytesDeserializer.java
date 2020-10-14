@@ -11,6 +11,7 @@ import com.github.cobolio.internal.util.ImmutableByteArray;
  * @author Andrew
  *
  */
+@Deprecated
 public class BytesDeserializer implements Deserializer<ImmutableByteArray> {
 	@Override
 	public ImmutableByteArray deserialize(byte[] data) {

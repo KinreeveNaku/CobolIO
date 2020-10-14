@@ -2,6 +2,9 @@
 target
 .classpath
 .project
+.iml
+.ipl
+doc
 src/**/*.class
 dependencies/*.*
 /dependencies/cobol2j/*
@@ -11,10 +14,8 @@ dependencies/*.*
 !/dependencies/cb2xml/cb2xml_Jaxb.jar
 /dependencies/*/com/
 /dependencies/MicroFocus
-/dependencies/dataaccess
 /dependencies/recgen
-src/main/java/com/CommonData.java
-src/main/java/com/DecimalData.java
-src/main/java/com/PackedDecimal$PackedDecimalOperand.java
-src/main/java/com/PackedDecimal.java
- 
+src/main/java/com/*.java
+src/main/java/com/ibm/*
+src/main/java/com/microfocus/*
+src/main/java/com/github/mfds2j/*

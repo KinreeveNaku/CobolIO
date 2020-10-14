@@ -10,10 +10,15 @@ import com.github.cobolio.types.TypeHandler;
  * @author Andrew
  *
  */
-//TODO Java Task: TODO Complete AlphanumericHandler
-public class AlphanumericHandler implements TypeHandler {
-	private boolean isDoubleByte = false;
-	private int offset;
+public class ZonedDecimalHandler implements TypeHandler {
+
+	/**
+	 * 
+	 */
+	public ZonedDecimalHandler(int offset) {
+		// TODO Auto-generated constructor stub
+	}
+
 	@Override
 	public Object parse(byte[] text) throws TypeConversionException {
 		// TODO Auto-generated method stub
@@ -31,5 +36,5 @@ public class AlphanumericHandler implements TypeHandler {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }

@@ -5,6 +5,10 @@ package com.github.cobolio.internal.cobol.types;
 
 import static com.github.cobolio.internal.cobol.types.ByteStates.*;
 
+import com.github.cobolio.internal.util.IllegalRangeException;
+import com.github.cobolio.internal.util.Messages;
+import com.github.cobolio.types.TypeConversionException;
+
 /**
  * @author Andrew
  *
@@ -47,7 +51,7 @@ public class BinaryLongFieldHandler implements IbmBinaryFieldHandler {
 			init(B8);
 			break;
 		default:
-			throw new IllegalArgumentException("Storage length of a Long must be between 1 and 8 bytes");
+			throw new IllegalRangeException(Messages.getString("com.github.cobolio.internal.cobol.types.BinaryLongFieldHandler.IllegalRange"));
 		}
 	}
 	
@@ -116,5 +120,22 @@ public class BinaryLongFieldHandler implements IbmBinaryFieldHandler {
 		} else {
 			return w == p;
 		}
+	}
+
+	@Override
+	public Object parse(byte[] text) throws TypeConversionException {
+		return get(text);
+	}
+
+	@Override
+	public byte[] format(Object value) {
+		byte[] b = new byte[this.storageLength];
+		encodeLong((Long)value, b, 0);
+		return b;
+	}
+
+	@Override
+	public Class<?> getType() {
+		return Long.TYPE;
 	}
 }

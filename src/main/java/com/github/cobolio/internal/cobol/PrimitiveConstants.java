@@ -77,6 +77,9 @@ public final class PrimitiveConstants {
 	public static final byte LOW_TWO = +0x02;// 32 / 2 = 16
 	public static final byte HIGH_TWO = +0x20;
 	public static final byte LOW_THREE = +0x03;// 48 / 3 = 16
+	/**
+	 * Low two bits of the high nibble
+	 */
 	public static final byte HIGH_THREE = +0x30;
 	public static final byte LOW_FOUR = +0x04;// 64 / 4 = 16
 	public static final byte HIGH_FOUR = +0x40;
@@ -85,6 +88,9 @@ public final class PrimitiveConstants {
 	public static final byte LOW_SIX = +0x06;// 96 / 6 = 16
 	public static final byte HIGH_SIX = +0x60;
 	public static final byte LOW_SEVEN = +0x07;// 112 / 7 = 16
+	/**
+	 * Low three bits of the high nibble
+	 */
 	public static final byte HIGH_SEVEN = +0x70;
 	public static final byte LOW_EIGHT = +0x08;// 128 / 8 = 16
 	public static final byte HIGH_EIGHT = (byte) +0x80;
@@ -94,10 +100,33 @@ public final class PrimitiveConstants {
 	public static final byte PACKED_OTHER_NEGATIVE_SIGN = 11;//-?
 	public static final byte PACKED_POSITIVE_SIGN = 12;//+
 	public static final byte PACKED_NEGATIVE_SIGN = 13;//-
+	public static final int PACKED_SIGN_MASK = 252;
+	public static final int PACKED_NEGATIVE_HIGH_SIGN = 253;
+	
 	public static final byte EXTERNAL_NEGATIVE_SIGN_SEPARATE = -48;
 	public static final byte EXTERNAL_NEGATIVE_SIGN_SEPARATE_OTHER = -80;
 	
+	public static final int EBCDIC_SIGN_EMBEDDED_TRAILING = 1;
+	public static final int EBCDIC_SIGN_EMBEDDED_LEADING = 2;
+	public static final int EBCDIC_SIGN_SEPARATE_TRAILING = 3;
+	public static final int EBCDIC_SIGN_SEPARATE_LEADING = 4;
 	
+	public static final byte PACKED_ZERO = 0;
+	public static final byte PACKED_SIGNED_ZERO = 12;
+	public static final byte PACKED_PLUS = 12;
+	public static final byte PACKED_MINUS = 13;
+	public static final byte PACKED_ALT_PLUS = 15;
+	public static final byte PACKED_ALT_PLUS1 = 14;
+	public static final byte PACKED_ALT_PLUS2 = 10;
+	public static final byte PACKED_ALT_MINUS = 11;
+	public static final byte EXTERNAL_SIGN_PLUS = 78;
+	public static final byte EXTERNAL_SIGN_MINUS = 96;
+	public static final byte EXTERNAL_EMBEDDED_SIGN_PLUS = -64;
+	public static final byte EXTERNAL_EMBEDDED_SIGN_MINUS = -48;
+	public static final byte EXTERNAL_EMBEDDED_SIGN_PLUS_ALTERNATE_A = -96;
+	public static final byte EXTERNAL_EMBEDDED_SIGN_PLUS_ALTERNATE_E = -32;
+	public static final byte EXTERNAL_EMBEDDED_SIGN_PLUS_ALTERNATE_F = -16;
+	public static final byte EXTERNAL_EMBEDDED_SIGN_MINUS_ALTERNATE_B = -80;
 	public static final byte LOW_NIBBLE_MASK = 15;
 	public static final byte BYTE_7F = 0x7F;
 	public static final byte HIGH_NIBBLE_MASK = -16;
@@ -109,6 +138,10 @@ public final class PrimitiveConstants {
 	public static final byte BIT_POS_4 = 0b00000100;
 	public static final byte BIT_POS_2 = 0b00000010;
 	public static final byte BIT_POS_1 = 0b00000001;
+	
+	public static final byte ASCII_PLUS = 43;
+	public static final byte ASCII_MINUS = 45;
+	public static final byte ASCII_ZED = 48;
 
 	static final long U_MIN = 0L;
 

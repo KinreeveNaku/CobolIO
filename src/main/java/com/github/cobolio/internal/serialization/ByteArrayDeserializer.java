@@ -9,6 +9,7 @@ import java.util.Map;
  * @author Andrew
  *
  */
+@Deprecated
 public class ByteArrayDeserializer implements Deserializer<byte[]> {
 
 	@Override
