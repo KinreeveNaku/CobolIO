@@ -3,16 +3,16 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.github.mfds2j</groupId>
-	<artifactId>mfds2j</artifactId>
-	<version>0.0.9-SNAPSHOT</version>
+	<groupId>com.github.cobolio</groupId>
+	<artifactId>CobolIO</artifactId>
+	<version>0.0.10-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Mainframe Dataset to Java</name>
+	<name>CobolIO</name>
 	<description></description>
 	<url />
 	<inceptionYear>2020</inceptionYear>
 	<organization>
-		<name>uhhh...</name>
+		<name>uhhh... the organization of me? I'm the only dev.</name>
 	</organization>
 	<licenses>
 		<license>
@@ -79,9 +79,12 @@
 
 	</distributionManagement>
 	<properties>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<forceJavacCompilerUse>true</forceJavacCompilerUse>
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 	<dependencyManagement />
 
@@ -173,35 +176,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>org.javassist</groupId>
-			<artifactId>javassist</artifactId>
-			<version>3.26.0-GA</version>
-		</dependency>
 		<!-- Serialization, Deserialization, and Transformation -->
 		<dependency>
 			<groupId>org.beanio</groupId>
 			<artifactId>beanio</artifactId>
 			<version>2.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.dozer</groupId>
-			<artifactId>dozer</artifactId>
-			<version>5.4.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>jcl-over-slf4j</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
@@ -230,12 +209,15 @@
 			<artifactId>logback-classic</artifactId>
 			<version>1.1.2</version>
 		</dependency>
+		<!-- Testing -->
+		<dependency>
+			<groupId>org.apache.avro</groupId>
+			<artifactId>avro-compiler</artifactId>
+			<version>1.9.1</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 	<repositories>
-		<!-- <repository> <id>MFDS2J</id> <url/> <releases> <enabled>true</enabled> 
-			</releases> <snapshots> <enabled>false</enabled> </snapshots> </repository> 
-			<repository> <id>MFDS2J-SNAPSHOT</id> <url/> <releases> <enabled>false</enabled> 
-			</releases> <snapshots> <enabled>true</enabled> </snapshots> </repository> -->
 	</repositories>
 	<pluginRepositories />
 	<build>
@@ -243,6 +225,16 @@
 		<filters>
 			<filter>src/main/resources/filter.properties</filter>
 		</filters>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.6.1</version>
+				<configuration>
+					<failOnError>false</failOnError>
+				</configuration>
+			</plugin>
+		</plugins>
 	</build>
 	<reporting></reporting>
 	<profiles></profiles>
