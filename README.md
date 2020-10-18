@@ -2,19 +2,23 @@
 <html lang="en">
 <head>
 	<meta charset="utf-8">
-	<style>
-	div.indented {
-		margin-left: 10%;
-		margin-right: 10%;
-	}
-	</style>
-	<script>
-		document.getElementById("year").innerHTML = new Date().getFullYear();
-	</script>
 	<title>COBOLIO</title>
 </head>
 <body>
 <div>
+	<table>
+	<tr>
+	<td>
+	<a href="https://frontend.code-inspector.com/public/project/5144/CobolIO/dashboard">Code-Inspector</a>
+	</td>
+	<td>
+	<object>
+		<img src="https://www.code-inspector.com/project/5144/score/svg"></img>
+		<img src="https://www.code-inspector.com/project/5144/status/svg"></img>
+	</object>
+	</td>
+	</tr>
+	</table>
 	<div class="indented">
 		<h1 style="align-content: center;">COBOLIO</h1>
 		<h3 style="align-content: center;">Developed by Kinreeve_Naku</h3>
@@ -74,9 +78,9 @@
 
 ------------------------------------------------------------
 
-<div class="indented">
+<div style="margin-left: 10%; margin-right: 10%;">
 <div style="align-content: center;">
-<p><ins id="year"></ins><noscript>Copyright &copy; 2020 the original author or authors.</noscript></p>
+<p><noscript>Copyright &copy; 2020 the original author or authors.</noscript></p>
 </div>
 <div style="align-content: center;">
 <p>Licensed under the Apache License, Version 2.0 (the "License");<br />
@@ -97,6 +101,5 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 limitations under the License.</p>
 </div>
 </div>
-<script>document.getElementById("year").innerHTML = "Copyright &copy; " + new Date().getFullYear() + " the original author or authors.";</script>
 </body>
 </html>

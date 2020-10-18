@@ -9,7 +9,7 @@
 	<packaging>jar</packaging>
 	<name>CobolIO</name>
 	<description></description>
-	<url />
+	<url/>
 	<inceptionYear>2020</inceptionYear>
 	<organization>
 		<name>uhhh... the organization of me? I'm the only dev.</name>
@@ -65,9 +65,9 @@
 	</prerequisites>
 	<modules />
 	<scm>
-		<connection></connection>
-		<developerConnection></developerConnection>
-		<url></url>
+		<connection>scm:https://github.com/KinreeveNaku/CobolIO</connection>
+		<developerConnection>scm:https://github.com/KinreeveNaku/CobolIO</developerConnection>
+		<url>https://github.com/KinreeveNaku/CobolIO</url>
 	</scm>
 	<issueManagement>
 
@@ -81,7 +81,7 @@
 	<properties>
 		<!-- SONAR PROPERTIES -->
 		<sonar.projectKey>KinreeveNaku_CobolIO</sonar.projectKey>
-		<sonar.organization>kinreevenaku-cobolio</sonar.organization>
+		<sonar.organization>kinreevenaku/cobolio</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<!-- CORE PROPERTIES -->
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
