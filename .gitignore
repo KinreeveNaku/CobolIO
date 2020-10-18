@@ -5,6 +5,7 @@ target
 .iml
 .ipl
 doc
+src/main/java/com/github/mfds2j/**
 src/**/*.class
 dependencies/*.*
 /dependencies/cobol2j/*
@@ -18,4 +19,3 @@ dependencies/*.*
 src/main/java/com/*.java
 src/main/java/com/ibm/*
 src/main/java/com/microfocus/*
-src/main/java/com/github/mfds2j/*
