@@ -79,7 +79,7 @@
 	<properties>
 		<!-- SONAR PROPERTIES -->
 		<sonar.projectKey>KinreeveNaku_CobolIO</sonar.projectKey>
-		<sonar.organization>kinreevenaku/cobolio</sonar.organization>
+		<sonar.organization>kinreevenaku-cobolio</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<!-- CORE PROPERTIES -->
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

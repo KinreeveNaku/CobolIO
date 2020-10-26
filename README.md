@@ -6,7 +6,7 @@
 [![SonarQube Maintainability](https://sonarcloud.io/api/project_badges/measure?project=KinreeveNaku/CobolIO&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=KinreeveNaku/CobolIO)
 [![SonarQube Reliability](https://sonarcloud.io/api/project_badges/measure?project=KinreeveNaku/CobolIO&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=KinreeveNaku/CobolIO)
 [![SonarQube Security](https://sonarcloud.io/api/project_badges/measure?project=KinreeveNaku/CobolIO&metric=security_rating)](https://sonarcloud.io/dashboard?id=KinreeveNaku/CobolIO)
-
+[![Coverage Status](https://coveralls.io/repos/github/KinreeveNaku/CobolIO/badge.svg?branch=master)](https://coveralls.io/github/KinreeveNaku/CobolIO?branch=master)
 COBOLIO
 ---------
 
