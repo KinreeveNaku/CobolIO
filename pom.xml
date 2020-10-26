@@ -5,7 +5,8 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.cobolio</groupId>
 	<artifactId>CobolIO</artifactId>
-	<version>0.0.10-SNAPSHOT</version>
+	<version>0.0.10-SNAPSHOT</version><!-- Build Version -->
+	<!-- <version>0.1.0-Alpha</version> --><!-- Official Version -->
 	<packaging>jar</packaging>
 	<name>CobolIO</name>
 	<description></description>
@@ -16,12 +17,9 @@
 	</organization>
 	<licenses>
 		<license>
-			<name>Apache License 2.0</name>
-			<url>http://www.spdx.org/licenses/Apache-2.0</url>
-		</license>
-		<license>
-			<name>Apple Public Source License 2.0</name>
-			<url>http://www.spdx.org/licenses/APSL-2.0</url>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<distribution>repo</distribution>
 		</license>
 		<license>
 			<name>Personal Opinion License(Made up)</name>
@@ -81,7 +79,7 @@
 	<properties>
 		<!-- SONAR PROPERTIES -->
 		<sonar.projectKey>KinreeveNaku_CobolIO</sonar.projectKey>
-		<sonar.organization>kinreevenaku/cobolio</sonar.organization>
+		<sonar.organization>kinreevenaku-cobolio</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 		<!-- CORE PROPERTIES -->
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
