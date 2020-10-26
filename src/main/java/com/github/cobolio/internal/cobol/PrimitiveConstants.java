@@ -146,7 +146,7 @@ public final class PrimitiveConstants {
 	static final long U_MIN = 0L;
 
 	private PrimitiveConstants() {
-		throw new IllegalArgumentException();
+		throw new IllegalAccessError();
 	}
 
 }

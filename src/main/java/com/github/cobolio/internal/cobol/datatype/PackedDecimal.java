@@ -4,8 +4,10 @@
 package com.github.cobolio.internal.cobol.datatype;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * <div>A packed decimal is a datatype in the COBOL language specification. In
@@ -24,13 +26,39 @@ import java.util.Arrays;
  * nibbles store the digits of a 7-digit decimal value, and the lowest nibble
  * indicates the sign of the decimal integer value.</div>
  * 
- * This class is intended to be fully self-contained and serializable.
+ * This class is intended to be fully self-contained and serializable. It also
+ * contains various static helper methods and convenience methods for performing
+ * various logical processes.
  * 
  * @author Andrew
  *
+ * @apiNote Any invocations of this class' constructors must make note that any
+ *          {@code Number} extending classes should have proper handling for
+ *          {@link #toString()}
+ * @since 0.1.0-Alpha
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "unused", "java:S1068"})
 public class PackedDecimal extends Number {
+	//Overall 0xA, 0xC, 0xE, and 0xF can be interpreted as +
+	//Whereas 0xB and 0xD can be interpreted as -
+	
+	private static final byte TWO = 2;
+	private static final byte LOW_NINE = 0x09;
+	private static final byte HIGH_THREE = 0x30;
+	private static final byte HIGH_NINE = (byte) +0x90;
+	private static final byte A = 0x0A;//Plus sign, ?
+	private static final byte B = 0x0B;//Minus sign, usually External?
+	private static final byte C = 0x0C;//Plus sign, usually External
+	private static final byte D = 0x0D;//Minus sign, usually Packed but also External
+	private static final byte E = 0x0E;//Plus sign, ?
+	private static final byte F = 0x0F;//Plus sign, usually Packed
+	
+	private static final byte PACKED_OTHER_NEGATIVE_SIGN = B;
+	private static final byte PACKED_NEGATIVE_SIGN = D;
+	
+	private static final byte LOW_NIBBLE_MASK = 15;
+	private static final byte HIGH_NIBBLE_MASK = -16;
+	
 	private static final int EBCDIC_SIGN_EMBEDDED_TRAILING = 1;
 	private static final int EBCDIC_SIGN_EMBEDDED_LEADING = 2;
 	private static final int EBCDIC_SIGN_SEPARATE_TRAILING = 3;
@@ -40,15 +68,16 @@ public class PackedDecimal extends Number {
 	private static final int ASCII_ZED = 48;
 	private static final boolean J_OPT_PERF;
 	private static final int ZERO_CHAR = '0';
+	
 	private final byte[] packedBytes;
-	private transient Number jValue;
+	private transient BigDecimal jValue;
 	private int precision;
 	private int scale;
 	private int decimalType;
 
 	static {
 		String opt = System.getProperty("cobolio.perfOpt");
-		J_OPT_PERF = opt != null ? Boolean.getBoolean(opt) : false;
+		J_OPT_PERF = opt != null ? Boolean.getBoolean(opt) : Boolean.FALSE;
 	}
 
 	/**
@@ -56,21 +85,22 @@ public class PackedDecimal extends Number {
 	 */
 	public PackedDecimal(byte[] packedBytes, int decimalType) {
 		this.packedBytes = packedBytes;
+		this.jValue = unpack(packedBytes, decimalType);
 		this.decimalType = decimalType;
 		initialize();
 	}
 
 	public PackedDecimal(Number n, int precision, int scale, int decimalType) {
-		this.packedBytes = null;
-		this.jValue = n;
+		this.packedBytes = pack(n, decimalType);
 		this.jValue = new BigDecimal(String.valueOf(n), MathContext.UNLIMITED);
 		this.precision = precision;
 		this.scale = scale;
+		this.decimalType = decimalType;
 		initialize();
 	}
 
 	public PackedDecimal(BigDecimal n, int decimalType) {
-		this.packedBytes = null;// TODO
+		this.packedBytes = null;
 		this.jValue = n;
 		this.precision = n.precision();
 		this.scale = n.scale();
@@ -89,17 +119,17 @@ public class PackedDecimal extends Number {
 	}
 
 	@Override
-	public float floatValue() {
+	public final float floatValue() {
 		return jValue.floatValue();
 	}
 
 	@Override
-	public double doubleValue() {
+	public final double doubleValue() {
 		return jValue.doubleValue();
 	}
 
 	@Override
-	public short shortValue() {
+	public final short shortValue() {
 		return jValue.shortValue();
 	}
 
@@ -109,7 +139,15 @@ public class PackedDecimal extends Number {
 	
 	public BigDecimal bigDecimalValue() {
 		//TODO auto-generated method stub
-		return null;
+		return this.jValue;
+	}
+	
+	public final int getPrecision() {
+		return this.precision;
+	}
+	
+	public final int getScale() {
+		return this.scale;
 	}
 	
 	public boolean isFractional() {
@@ -123,32 +161,30 @@ public class PackedDecimal extends Number {
 	private void initialize() {
 		// TODO Construct initialization logic : Evaluate the raw value, and interpret
 		// it into the various storage forms for performance sake.
+		if(jValue == null && this.packedBytes != null) {
+			
+		}
 	}
 
 	private static final Number infer(byte[] bytes, int precision, int scale) {
 		if (J_OPT_PERF) {
 
 		}
+		return null;//TODO
 	}
-
-	private static final byte[] convert(BigDecimal bd, int decimalType) {
-		int precision = bd.precision();
-		byte[] packedBytes;
-		char[] unscaledAbs = bd.unscaledValue().abs().toString().toCharArray();
-		int sign = bd.signum();
-		int length = getLength(precision);
-		switch(decimalType) {
-		case EBCDIC_SIGN_EMBEDDED_TRAILING :
-			packedBytes = new byte[length];
-			break;
-		case EBCDIC_SIGN_EMBEDDED_LEADING :
-			break;
-		case EBCDIC_SIGN_SEPARATE_TRAILING :
-			break;
-		case EBCDIC_SIGN_SEPARATE_LEADING :
-			break;
-		default : throw new IllegalArgumentException("Decimal Type must be 1, 2, 3, or 4");
-		}
+	
+	/**
+	 * 
+	 * @param bd
+	 * @param decimalType
+	 * @return
+	 */
+	public static final byte[] pack(Number n, int decimalType) {
+		return packExplained(n, decimalType);//TODO Ultimately the Explained methods should not be used, but work for now.
+	}
+	
+	public static final BigDecimal unpack(byte[] bytes, int decimalType) {
+		return unpackExplained(bytes, decimalType);
 	}
 
 	public static final int getLength(int precision) {
@@ -159,56 +195,11 @@ public class PackedDecimal extends Number {
 		return (precision / HALF) + 1;
 	}
 	
-	/**
-	 * 
-	 * @param ho The high order nibble
-	 * @param lo The low order nibble
-	 * @return Returns the packed format of the two digits.
-	 */
-	@SuppressWarnings("java:S3034")//Suppressed because low nibble will never be negative when used properly.
-	private static final byte pack(int ho, int lo) {
-		return (byte) ((ho << NIBBLE_LENGTH) + lo);//(ho * 16) + lo
-		
+	public static int sign(byte b) {
+		return getSign(b & LOW_NIBBLE_MASK) == D ? -1 : 1;
 	}
-	
-	private static final byte[] pack(char[] chars, int precision, int decimalType) {
-		byte[] bytes = new byte[getLength(precision)];
-		boolean neg = chars[0] == '-';
-		int charStart = neg ? 1 : 0;
-		int charEnd = chars.length - 1;
-		int[] digits = getDigitsFromAsciiChars(chars, charStart, charEnd);
-		int sign = (byte) (neg ? 13 : 12);
-		switch(decimalType) {
-		case EBCDIC_SIGN_EMBEDDED_TRAILING :
-			//sign stored as the low order nibble of the last element with either the last digit or by itself
-			byte b;
-			for (digits[charEnd--] = (byte) ((neg ? 13 : 12) | chars[charEnd--] - 48 << 4); charEnd >= 0; digits[charEnd--] = b) {
-				//set byte at last position as = sign nibble ORing chars.last - 48 << 4
-			}
-				b = 0;
-				if (charEnd >= charStart) {
-					b = (byte) (chars[charEnd--] - 48);
-					if (charEnd >= charStart) {
-						b = (byte) (b | chars[charEnd--] - 48 << 4);
-					}
-				}
-			break;
-		case EBCDIC_SIGN_EMBEDDED_LEADING :
-			//sign stored as the high order nibble of the first element
-			
-			break;
-		case EBCDIC_SIGN_SEPARATE_TRAILING :
-			//sign stored as the high order nibble of the last element by itself
-			
-			break;
-		case EBCDIC_SIGN_SEPARATE_LEADING :
-			//sign stored as the high order nibble of the first element by itself
-			break;
-		default :
-			throw new IllegalArgumentException("");
-		}
-		return bytes;
-		
+	private static byte getSign(int i) {
+		return (i != D && i != B ? C : D);
 	}
 	
 	private static final int[] getDigitsFromAsciiChars(char[] chars, int start, int end) {
@@ -219,8 +210,343 @@ public class PackedDecimal extends Number {
 		return digits;
 	}
 	
-	private int getDigitFromAsciiChar(char c) {
+	private static int getDigitFromAsciiChar(char c) {
 		return c - ASCII_ZED;//48 is ASCII 0.
+	}
+	
+	
+	@SuppressWarnings({ "java:S109", "java:S3358", "java:S3776" })
+	public static final int numDigits(int value) {
+		value = value == Integer.MIN_VALUE ? Integer.MAX_VALUE : Math.abs(value);
+		return value >= 10000
+				? (value >= 10000000 ? (value >= 100000000 ? (value >= 1000000000 ? 10 : 9) : 8)
+						: (value >= 100000 ? (value >= 1000000 ? 7 : 6) : 5))
+				: (value >= 100 ? (value >= 1000 ? 4 : 3) : (value >= 10 ? 2 : 1));
+	}
+
+	@SuppressWarnings({ "java:S109", "java:S3358", "java:S3776" })
+	public static final int numDigits(long value) {
+		value = value == Long.MIN_VALUE ? Long.MAX_VALUE : Math.abs(value);
+		return value >= 1000000000L
+				? (value >= 100000000000000L ? (value >= 10000000000000000L
+						? (value >= 100000000000000000L ? (value >= 1000000000000000000L ? 19 : 18) : 17)
+						: (value >= 1000000000000000L ? 16 : 15))
+						: (value >= 100000000000L
+								? (value >= 1000000000000L ? (value >= 10000000000000L ? 14 : 13) : 12)
+								: (value >= 10000000000L ? 11 : 10)))
+				: (value >= 10000L
+						? (value >= 1000000L ? (value >= 10000000L ? (value >= 100000000L ? 9 : 8) : 7)
+								: (value >= 100000L ? 6 : 5))
+						: (value >= 100L ? (value >= 1000L ? 4 : 3) : (value >= 10L ? 2 : 1)));
+	}
+	
+	/**
+	 * 
+	 * 
+	 * HIGH_THREE in this context is used as the offset position of the first
+	 * numeric character, '0', which is index 48.
+	 * 
+	 * @param bytes
+	 * @return
+	 */
+	public static final String packedToString(byte[] bytes, boolean showSign) {
+		return packedToStringBuilder(bytes, showSign).toString();
+	}
+
+	public static final BigDecimal packedToBigDecimal(byte[] bytes, int scale, int precision) {
+		StringBuilder builder = packedToStringBuilder(bytes, false);
+		builder.insert(precision - scale, '.');
+		return new BigDecimal(builder.toString());
+	}
+	
+	public static final StringBuilder packedToStringBuilder(byte[] bytes, boolean showSign) {
+		StringBuilder builder = new StringBuilder();
+		int end = bytes.length - 1;
+		if ((bytes[end] & LOW_NIBBLE_MASK) == PACKED_OTHER_NEGATIVE_SIGN
+				|| (bytes[end] & LOW_NIBBLE_MASK) == PACKED_NEGATIVE_SIGN) {
+			builder.append('-');
+		} else if (showSign) {
+			builder.append('+');
+		} else {
+			// Do nothing
+		}
+		for (int i = 0; i < bytes.length - 1; i++) {
+			builder.append((char) HIGH_THREE + ((byte) (bytes[i] >> NIBBLE_LENGTH) & LOW_NIBBLE_MASK));// High Nibble
+																										// packed digit.
+			builder.append((char) HIGH_THREE + (bytes[i] & LOW_NIBBLE_MASK));// Low Nibble packed digit.
+		}
+		builder.append(HIGH_THREE + ((byte) (bytes[end] >> NIBBLE_LENGTH) & LOW_NIBBLE_MASK));// Digit that is packed
+																								// with the sign.
+		return builder;
+	}
+
+	public static int getPackedByteCount(int precision) {
+		return precision / TWO + 1;
+	}
+
+	public static final int checkPackedDecimal(byte[] byteArray, int offset, int precision,
+			boolean ignoreHighNibbleForEvenPrecision, boolean canOverwriteHighNibbleForEvenPrecision) {
+		if (offset + precision / TWO + 1 <= byteArray.length && offset >= 0) {
+			return checkPackedDecimalContent(byteArray, offset, precision, ignoreHighNibbleForEvenPrecision,
+					canOverwriteHighNibbleForEvenPrecision);
+		} else {
+			throw new ArrayIndexOutOfBoundsException(
+					"Array access index out of bounds. checkPackedDecimal is trying to access byteArray[" + offset
+							+ "] to byteArray[" + (offset + precision / TWO) + "] but valid indices are from 0 to "
+							+ (byteArray.length - 1) + ".");
+		}
+	}
+
+	public static final int checkPackedDecimalContent(byte[] byteArray, int offset, int precision,
+			boolean ignoreHighNibbleForEvenPrecision, boolean canOverwriteHighNibbleForEvenPrecision) {
+		if (precision < 1) {
+			throw new IllegalArgumentException("Illegal Precision.");
+		} else {
+			boolean evenPrecision = precision % TWO == 0;
+			int signOffset = offset + getPackedByteCount(precision) - 1;
+			int returnCode = 0;
+			if (canOverwriteHighNibbleForEvenPrecision && evenPrecision) {
+				byteArray[offset] = (byte) (byteArray[offset] & LOW_NIBBLE_MASK);
+			}
+			if (evenPrecision && ignoreHighNibbleForEvenPrecision) {
+				if ((byteArray[offset] & LOW_NIBBLE_MASK) > LOW_NINE) {
+					returnCode = TWO;
+				}
+				++offset;
+			}
+			int i;
+			for (i = offset; i < signOffset && byteArray[i] == 0; ++i) {
+			}
+			while (i < signOffset) {
+				if ((byteArray[i] & LOW_NIBBLE_MASK) > LOW_NINE
+						|| (byteArray[i] & HIGH_NIBBLE_MASK & 255) > HIGH_NINE) {
+					returnCode = TWO;
+					break;
+				}
+				++i;
+			}
+			if (i == signOffset && (byteArray[signOffset] & HIGH_NIBBLE_MASK & 255) > HIGH_NINE) {
+				returnCode = TWO;
+			}
+			if ((byteArray[signOffset] & LOW_NIBBLE_MASK) < A) {
+				++returnCode;
+			}
+			return returnCode;
+		}
+	}
+
+	public static final int checkPackedDecimal(byte[] byteArray, int offset, int precision,
+			boolean ignoreHighNibbleForEvenPrecision) {
+		return checkPackedDecimal(byteArray, offset, precision, ignoreHighNibbleForEvenPrecision, false);
+	}
+
+	public static final int checkPackedDecimal(byte[] byteArray, int offset, int precision) {
+		return checkPackedDecimal(byteArray, offset, precision, false, false);
+	}
+
+	public static final BigInteger getBigInteger(byte[] pd, int offset, int length) {
+		int end = offset + length - 1;
+		StringBuilder sb = new StringBuilder();
+		if ((pd[end] & LOW_NIBBLE_MASK) == PACKED_OTHER_NEGATIVE_SIGN
+				|| (pd[end] & LOW_NIBBLE_MASK) == PACKED_NEGATIVE_SIGN) {
+			sb.append('-');
+		}
+
+		for (int i = offset; i < end; ++i) {
+			sb.append((char) (HIGH_THREE + (((byte) (pd[i] >> NIBBLE_LENGTH)) & LOW_NIBBLE_MASK)));
+			sb.append((char) (HIGH_THREE + (pd[i] & LOW_NIBBLE_MASK)));
+		}
+
+		sb.append((char) (HIGH_THREE + (((byte) (pd[end] >> NIBBLE_LENGTH)) & LOW_NIBBLE_MASK)));
+		return new BigInteger(sb.toString());
+	}
+
+	public static void zeroTopNibbleIfEven(byte[] bytes, int offset, int prec) {
+		if (prec % TWO == 0) {
+			bytes[offset] = (byte) (bytes[offset] & LOW_NIBBLE_MASK);
+		}
+
+	}
+	
+	// @Alpha(major = 0, minor = 0, snapshot = 10)
+	/**
+	 * This method displays a simplified explanation of how COBOL Packed Decimal
+	 * value is converted into a Java datatype.
+	 * 
+	 * The overall process is to extract the sign nibble from the byte array, and
+	 * extract each of the digit nibbles, then interpret this data along with the
+	 * scale and precision.
+	 * 
+	 * The first step is to extract the sign. This can be done in one of two ways.
+	 * Either have some argument indicate where the sign nibble is and fetch it
+	 * directly, or extract it through an exhaustive search of the byte array. Both
+	 * have their inherent flaws.
+	 * 
+	 * The next step is to iteratively break down each of the bytes into nibbles in
+	 * the byte array, excluding the sign nibble, and convert them into numeric
+	 * symbols. There are countless ways to do this. After this is done, the numeric
+	 * symbols need to be sequentially joined to create one complete numeric
+	 * literal, with each of the decimal places being represented by its
+	 * corresponding nibble.
+	 * 
+	 * <pre>
+	 * Note: Assume precision is 15
+	 * 
+	 * [C8][32][18][56][23][99][17][40]
+	 *  ^^  ^^  ^^  ^^  ^^  ^^  ^^  ^^
+	 *  ||  ||  ||  ||  ||  ||  ||  ||
+	 *  V----------VVVVVV-------------
+	 *  S          Digits
+	 * </pre>
+	 * 
+	 * S is the sign nibble in this instance and Digits are the nibbles representing
+	 * each digit of the translated value In COBOL packed decimal logic, C is the
+	 * hexadecimal numeric for POSITIVE, so this value is positive. The final number
+	 * would be +832185623991740.
+	 * 
+	 * Depending on the precision, this could change slightly though. If the
+	 * precision is 14 for example, then that last nibble 0 should get skipped,
+	 * which would mean the translated value is actually +83218562399174 and a
+	 * precision of 15 would result in +832185623991740
+	 * 
+	 * Care must be taken when performing this logic however. Because if the sign
+	 * nibble is at the end, then under-developed logic could unintentionally
+	 * truncate the sign nibble. e.g.:
+	 * 
+	 * <pre>
+	 * [83][21][85][62][39][91][74][0C]
+	 * </pre>
+	 * 
+	 * leading to 832185623991740 where the precision is 14 and no sign. No error
+	 * would be thrown but the result is incorrect.
+	 * 
+	 * 
+	 * <div> Finally if the packed decimal value has a scale greater than 0, then
+	 * the decimal point must be correctly positioned to the proper location. So if
+	 * the value has a scale of 5 and a precision of 15, then the final value should
+	 * be </div>
+	 * 
+	 * <pre>
+	 * [83][21][85][62][39][91][74][0C] == +8321856239.91740
+	 * </pre>
+	 * 
+	 * 
+	 * @param bytes The byte[] containing the packed decimal value in its raw form.
+	 * @param scale The number of fractional digits
+	 * @return Returns a BigDecimal value representing the value stored as a Packed
+	 *         Decimal.
+	 * @category Confirmed
+	 */
+	static final BigDecimal unpackExplained(byte[] bytes, int scale) {//Needs precision argument for boundary support
+		char sign = 0;
+		char[] chars = new char[(bytes.length * 2) + 1];//Rough approximation of precision. String trimming accounts for inaccuracy.
+		int i = 1;
+		for(byte b : bytes) {
+			if((b & 0xF0) > 0xA0) {//isSign, A0 is any hexadecimal letter value for the HO Nibble
+				sign = sign((byte) (b >> 4)) == 1 ? '+' : '-';//if sign nibble is 'C', return '+'. If sign nibble is B or D, return '-'. 
+				chars[i] = (char) ((b & 0x0F) + 48);//Get LO Nibble and convert to ASCII numeric.
+				i++;
+			} else if((b & 0x0F) > 0x0A) {//isSign, 0A is any hexadecimal letter value for the LO Nibble
+				sign = sign(b) == 1 ? '+' : '-';//if sign nibble is 'C', return '+'. If sign nibble is B or D, return '-'.
+				chars[i] = (char) (((b & 0xF0) >> 4) + 48);//Get HO Nibble and convert to ASCII numeric.
+				i++;
+			} else {//Not a sign byte, perform standard handling.
+				chars[i] = (char) (((b & 0xF0) >> 4) + 48);//Get HO Nibble and convert to ASCII numeric.
+				i++;
+				chars[i] = (char) ((b & 0x0F) + 48);//Get LO Nibble and convert to ASCII numeric.
+				i++;
+			}
+		}
+		chars[0] = sign != 0 ? sign : '+';//set start of string to the interpolated sign.
+		return new BigDecimal(new BigInteger(new String(chars).trim()), scale);//convert to unscaled BigInteger, and then to scaled BigDecimal.
+	}
+	
+	static byte[] packExplained(Number n, int decimalType) {
+		String stringValue = n.toString();
+		if(stringValue.contains(".")) {
+			stringValue = stringValue.substring(0, stringValue.indexOf('.')).concat(stringValue.substring(stringValue.indexOf('.') + 1));
+		}
+		int decant = (stringValue.contains("+") || stringValue.contains("-")) ? 1 : 0;
+		char[] chars = stringValue.toCharArray();
+		byte[] bytes = new byte[getLength(stringValue.length() - decant)];//The byte array that will be returned
+		byte[] nibbles = new byte[stringValue.length()];//An array containing each individual nibble as its own byte value
+		int signPosition = signPositionByType(decimalType, nibbles.length);
+		for(int i = 0, j = 0; i < chars.length; i++, j++) {
+			if(chars[i] == '+') {
+				nibbles[signPosition] = 0x0F;//If the character is +, then set the sign nibble to F
+				//below we are decrementing the nibbles array index back one so we don't skip over an index without storing anything 
+				j--;//TODO How can this be moved back into the for loop logic
+				
+			} else if(chars[i] == '-') {
+				nibbles[signPosition] = 0x0D;//If the character is -, then set the sign nibble to D
+				//below we are decrementing the nibbles array index back one so we don't skip over an index without storing anything
+				j--;//TODO How can this be moved back into the for loop logic
+			} else if(chars[i] == '.') {//If the character is '.', disregard it 
+				//Just skip it
+			} else {
+				//Assuming contents were checked, this must be a numeric ascii character, so subtracting 48 will give us the corresponding binary representation of this character.
+				nibbles[j] = (byte) (chars[i] - 48);
+			}
+		}
+		//FIXED Correct until here...
+		int i = 0;
+		int j = 0;
+		while(i < nibbles.length) {
+			if(i % 2 == 0) {//true if i is even
+				//Flip-flopping between the high order and low order nibble of each byte in 'bytes'.
+				bytes[j] = (byte) ((bytes[j] & 0x0F) |(byte) (nibbles[i] << 4));
+			} else {//true if i is odd
+				bytes[j] = (byte) ((bytes[j] & 0xF0) | nibbles[i]);
+				j++;//This is the low order byte, so increment to the next byte on the next iteration
+			}
+			i++;//increment to the next nibble position on the next iteration
+		}
+		return bytes;
+	}
+	
+	/**
+	 * Returns the position in an array of nibble values where the sign is expected to be.
+	 * @param decimalType The type of decimal storage style.
+	 * @param byteArrayLength The length of the array of nibbles
+	 * @return Returns the index where the sign nibble is expected to be.
+	 */
+	private static final int signPositionByType(int decimalType, int byteArrayLength) {
+		switch(decimalType) {
+		case 1:
+			return byteArrayLength - 1;
+		case 2:
+			return 0;
+		case 3:
+			return byteArrayLength - 1;
+		case 4:
+			return 0;
+		default:
+			throw new IllegalArgumentException();
+				
+		}
+	}
+	/**
+	 * Returns the value of this PackedDecimal in String format.
+	 * This method simply calls the #toString() method of the BigDecimal class.
+	 * @return Returns a String representation of this numeric value.
+	 */
+	@Override
+	public String toString() {
+		return this.jValue.toString();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if(o == null || o instanceof PackedDecimal) {
+			return false;
+		} else {
+			return Arrays.equals(this.rawValue(), ((PackedDecimal)o).rawValue());
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(this.jValue, this.packedBytes, this.precision, this.scale);
 	}
 	/*
 	 * embedded
