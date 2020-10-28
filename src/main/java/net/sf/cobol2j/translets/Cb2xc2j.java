@@ -89,6 +89,8 @@ public class Cb2xc2j {
 		xformFactory.setAttribute("package-name", "net.sf.cobol2j.translets");
 		Transformer transformer = xformFactory.newTransformer(new StreamSource(TRANSLET_NAME));
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 		factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
 		DocumentBuilder docbuilder = factory.newDocumentBuilder();
 		Document xc2jdoc = docbuilder.newDocument();
