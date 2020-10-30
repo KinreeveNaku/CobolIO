@@ -6,6 +6,7 @@ target
 .ipl
 doc
 src/main/java/com/github/mfds2j/**
+src/main/java/net/sf/**
 src/**/*.class
 dependencies/*.*
 /dependencies/cobol2j/*
