@@ -43,7 +43,7 @@
 				<role>Owner</role>
 			</roles>
 			<properties>
-				<CanDivideByZero>true</CanDivideByZero>
+				<CanDivideByZero>false</CanDivideByZero>
 			</properties>
 		</developer>
 	</developers>
