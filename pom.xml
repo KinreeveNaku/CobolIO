@@ -89,7 +89,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<forceJavacCompilerUse>true</forceJavacCompilerUse>
-		<!-- <maven.test.skip>true</maven.test.skip> -->
+		<maven.test.skip>true</maven.test.skip>
 	</properties>
 	<dependencyManagement />
 
