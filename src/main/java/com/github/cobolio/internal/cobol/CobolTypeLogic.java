@@ -5,6 +5,7 @@ package com.github.cobolio.internal.cobol;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import static com.github.cobolio.internal.cobol.PrimitiveConstants.*;
 
@@ -29,12 +30,37 @@ public final class CobolTypeLogic {
 	private static final long TEN_7 = 10000000;
 	private static final long TEN_8 = 100000000;
 	private static final long TEN_9 = 1000000000;
+	
+	private static final byte[] P2E_LOOKUP;
+	private static final byte[] E2U_LOOKUP;
+	static {
+		P2E_LOOKUP = new byte[512];
+		E2U_LOOKUP = new byte[256];
+		Arrays.fill(P2E_LOOKUP, (byte) 0);
+		Arrays.fill(E2U_LOOKUP, (byte) 0);
 
+		int i;
+		int j;
+		int low;
+		for (i = 0; i < 10; ++i) {
+			for (j = 0; j < 10; ++j) {
+				low = i * 16 + j;
+				P2E_LOOKUP[low * 2] = (byte) (240 | i);
+				P2E_LOOKUP[low * 2 + 1] = (byte) (240 | j);
+			}
+		}
+
+		for (i = 0; i < 10; ++i) {
+			j = 240 | i;
+			E2U_LOOKUP[j + 1] = (byte) (48 | i);
+		}
+	}
+	
 	/**
 	 * 
 	 */
 	private CobolTypeLogic() {
-		throw new IllegalStateException();
+		throw new IllegalAccessError();
 	}
 
 	/*
@@ -94,11 +120,11 @@ public final class CobolTypeLogic {
 		temp[0] = (char) (sign != PACKED_NEGATIVE_SIGN && sign != PACKED_OTHER_NEGATIVE_SIGN ? ASCII_ZED : ASCII_MINUS);
 
 		for (int i = 0; i < length - 1; ++i) {
-			temp[LOW_TWO * i + 1] = (char) (ASCII_ZED + ((byteArray[i + offset] >>> NIBBLE_LENGTH) & LOW_NIBBLE_MASK));
+			temp[LOW_TWO * i + 1] = (char) (ASCII_ZED + ((byteArray[i + offset] >>> NIBBLE_LENGTH) & (LOW_NIBBLE_MASK & 0xFF)));
 			temp[LOW_TWO * i + LOW_TWO] = (char) (ASCII_ZED + (byteArray[i + offset] & LOW_NIBBLE_MASK));
 		}
 
-		temp[length * LOW_TWO - 1] = (char) (HIGH_THREE + ((byteArray[offset + length - 1] >>> NIBBLE_LENGTH) & LOW_NIBBLE_MASK));
+		temp[length * LOW_TWO - 1] = (char) (HIGH_THREE + ((byteArray[offset + length - 1] >>> NIBBLE_LENGTH) & (LOW_NIBBLE_MASK & 0xFF)));
 		return new BigDecimal(new BigInteger(new String(temp)), scale);
 	}
 	
@@ -131,10 +157,9 @@ public final class CobolTypeLogic {
 			byteArray[offset + length - 1] = (byte) (buffer[numDigitsLeft] - ASCII_ZED << NIBBLE_LENGTH);
 			byteArray[offset + length - 1] = (byte) (byteArray[offset + length - 1] | (value.signum() == -1 ? PACKED_NEGATIVE_SIGN : PACKED_POSITIVE_SIGN));
 
-			for (int i = numDigitsLeft - 1; i >= endPosition && offset + index >= 0; --index) {
+			for (int i = numDigitsLeft - 1; i >= endPosition && offset + index >= 0; --index, i-=2) {
 				byteArray[offset + index] = (byte) (buffer[i] - ASCII_ZED);
 				byteArray[offset + index] |= (byte) ((buffer[i - 1] - ASCII_ZED) << NIBBLE_LENGTH);
-				i -= 2;
 			}
 			if (endPosition > 0 && offset + index >= 0) {
 				byteArray[offset + index] = (byte) (buffer[0] - ASCII_ZED);
@@ -268,21 +293,22 @@ public final class CobolTypeLogic {
 
 		private static void writeShortUnchecked(short value, byte[] byteArray, int offset, boolean bigEndian, int numBytes) {
 			switch (numBytes) {
-				
-				case 1 :
+			case 0 :
+				break;
+			case 1 :
+				byteArray[offset] = (byte) value;
+				break;
+			case 2 :
+				if (bigEndian) {
+					byteArray[offset] = (byte) (value >> 8);
+					byteArray[offset + 1] = (byte) value;
+				} else {
+					byteArray[offset + 1] = (byte) (value >> 8);
 					byteArray[offset] = (byte) value;
-					break;
-				case 2 :
-					if (bigEndian) {
-						byteArray[offset] = (byte) (value >> 8);
-						byteArray[offset + 1] = (byte) value;
-					} else {
-						byteArray[offset + 1] = (byte) (value >> 8);
-						byteArray[offset] = (byte) value;
-					}
-				case 0 :
-				default :
-					break;
+				}
+				break;
+			default :
+				break;
 			}
 
 		}
@@ -330,45 +356,46 @@ public final class CobolTypeLogic {
 
 		private static void writeIntUnchecked(int value, byte[] byteArray, int offset, boolean bigEndian, int numBytes) {
 			switch (numBytes) {
-				
-				case 1 :
+			case 0 :
+				break;
+			case 1 :
+				byteArray[offset] = (byte) value;
+				break;
+			case 2 :
+				if (bigEndian) {
+					byteArray[offset] = (byte) (value >> 8);
+					byteArray[offset + 1] = (byte) value;
+				} else {
+					byteArray[offset + 1] = (byte) (value >> 8);
 					byteArray[offset] = (byte) value;
-					break;
-				case 2 :
-					if (bigEndian) {
-						byteArray[offset] = (byte) (value >> 8);
-						byteArray[offset + 1] = (byte) value;
-					} else {
-						byteArray[offset + 1] = (byte) (value >> 8);
-						byteArray[offset] = (byte) value;
-					}
-					break;
-				case 3 :
-					if (bigEndian) {
-						byteArray[offset] = (byte) (value >> 16);
-						byteArray[offset + 1] = (byte) (value >> 8);
-						byteArray[offset + 2] = (byte) value;
-					} else {
-						byteArray[offset + 2] = (byte) (value >> 16);
-						byteArray[offset + 1] = (byte) (value >> 8);
-						byteArray[offset] = (byte) value;
-					}
-					break;
-				case 4 :
-					if (bigEndian) {
-						byteArray[offset] = (byte) (value >> 24);
-						byteArray[offset + 1] = (byte) (value >> 16);
-						byteArray[offset + 2] = (byte) (value >> 8);
-						byteArray[offset + 3] = (byte) value;
-					} else {
-						byteArray[offset + 3] = (byte) (value >> 24);
-						byteArray[offset + 2] = (byte) (value >> 16);
-						byteArray[offset + 1] = (byte) (value >> 8);
-						byteArray[offset] = (byte) value;
-					}
-				case 0 :
-				default :
-					break;
+				}
+				break;
+			case 3 :
+				if (bigEndian) {
+					byteArray[offset] = (byte) (value >> 16);
+					byteArray[offset + 1] = (byte) (value >> 8);
+					byteArray[offset + 2] = (byte) value;
+				} else {
+					byteArray[offset + 2] = (byte) (value >> 16);
+					byteArray[offset + 1] = (byte) (value >> 8);
+					byteArray[offset] = (byte) value;
+				}
+				break;
+			case 4 :
+				if (bigEndian) {
+					byteArray[offset] = (byte) (value >> 24);
+					byteArray[offset + 1] = (byte) (value >> 16);
+					byteArray[offset + 2] = (byte) (value >> 8);
+					byteArray[offset + 3] = (byte) value;
+				} else {
+					byteArray[offset + 3] = (byte) (value >> 24);
+					byteArray[offset + 2] = (byte) (value >> 16);
+					byteArray[offset + 1] = (byte) (value >> 8);
+					byteArray[offset] = (byte) value;
+				}
+				break;
+			default :
+				break;
 			}
 
 		}
@@ -385,7 +412,7 @@ public final class CobolTypeLogic {
 		}
 
 		private static void writeLongUnchecked(long value, byte[] byteArray, int offset, boolean bigEndian) {
-			if (bigEndian) {
+			if (bigEndian) {//whether the order of bits should be reversed or not
 				byteArray[offset] = (byte) ((int) (value >> 56));
 				byteArray[offset + 1] = (byte) ((int) (value >> 48));
 				byteArray[offset + 2] = (byte) ((int) (value >> 40));
@@ -568,5 +595,4 @@ public final class CobolTypeLogic {
 			writeLong(Double.doubleToLongBits(value), byteArray, offset, bigEndian);
 		}
 	}
-
 }

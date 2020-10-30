@@ -11,13 +11,6 @@ package com.github.cobolio.internal.util.transform;
  */
 public final class PrimitiveTransform {
 
-	/**
-	 * 
-	 */
-	private PrimitiveTransform() {
-		throw new UnsupportedOperationException();
-	}
-
 	// BEGIN Boolean ->
 
 	/**
@@ -327,4 +320,11 @@ public final class PrimitiveTransform {
 	 * A function that converts shorts to longs.
 	 */
 	public static final TransformFunction<Short, Long> Short_Long = s -> (long) (short) s;
+
+	/**
+	 * 
+	 */
+	private PrimitiveTransform() {
+		throw new UnsupportedOperationException();
+	}
 }

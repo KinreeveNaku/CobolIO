@@ -17,16 +17,16 @@ public class IllegalRangeException extends RuntimeException {
 
 	/**
 	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 
 	 * @param message
 	 * @see RuntimeException#RuntimeException(String)
 	 */
 	public IllegalRangeException(String message) {
 		super(message);
 	}
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 
 }

@@ -7,12 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.beanio.BeanIOConfigurationException;
-
 import com.github.cobolio.types.ConfigurableTypeHandler;
-import com.github.cobolio.types.EnumTypeHandler;
 import com.github.cobolio.types.TypeHandler;
-import com.github.mfds2j.Alpha;
+import com.github.Alpha;
 
 /**
  * @author Andrew
@@ -90,7 +87,7 @@ public class TypeHandlerFactory {
 	 *         handler registered for the name
 	 * @throws IllegalArgumentException if a custom property value was invalid
 	 */
-	public TypeHandler getTypeHandler(String name, Properties properties) throws IllegalArgumentException {
+	public TypeHandler getTypeHandler(String name, Properties properties) {
 		if (name == null) {
 			throw new NullPointerException();
 		}
@@ -138,8 +135,7 @@ public class TypeHandlerFactory {
 	 * @throws IllegalArgumentException if a custom property value was invalid
 	 * @since 2.0
 	 */
-	public TypeHandler getTypeHandlerFor(String type, String format, Properties properties)
-			throws IllegalArgumentException {
+	public TypeHandler getTypeHandlerFor(String type, String format, Properties properties) {
 		if (type == null) {
 			throw new NullPointerException();
 		}
@@ -178,38 +174,17 @@ public class TypeHandlerFactory {
 	 * @throws IllegalArgumentException if a custom property value was invalid
 	 * @since 2.0
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ })
 	public TypeHandler getTypeHandlerFor(Class<?> clazz, String format, Properties properties) {
 		if (clazz == null) {
 			throw new NullPointerException();
 		}
 		clazz = TypeUtil.toWrapperClass(clazz);
 
-		TypeHandler handler = getHandler(TYPE_KEY + clazz.getName(), format, properties);
-		if (handler == null && Enum.class.isAssignableFrom(clazz)) {
-			return getEnumHandler((Class<Enum>) clazz, properties);
-		}
-
-		return handler;
+		return getHandler(TYPE_KEY + clazz.getName(), format, properties);
 	}
 
-	@SuppressWarnings({ "rawtypes", "java:S1905", "java:S3740" })
-	private TypeHandler getEnumHandler(Class<Enum> clazz, Properties properties) {
-		String format = null;
-		if (properties != null) {
-			format = properties.getProperty("format");
-		}
-		if (format == null || "name".equals(format)) {
-			return new EnumTypeHandler((Class<Enum>) clazz);
-		} else if ("toString".equals(format)) {
-			return new ToStringEnumTypeHandler((Class<Enum>) clazz);
-		} else {
-			throw new BeanIOConfigurationException(// TODO change this
-					"Invalid format '" + format + "', " + "expected 'toString' or 'name' (default)");
-		}
-	}
-
-	private TypeHandler getHandler(String key, String format, Properties properties) throws IllegalArgumentException {
+	private TypeHandler getHandler(String key, String format, Properties properties) {
 		TypeHandler handler = null;
 		TypeHandlerFactory factory = this;
 		while (factory != null) {
@@ -266,7 +241,7 @@ public class TypeHandlerFactory {
 	 * @throws IllegalArgumentException if the type name is invalid or if the
 	 *                                  handler type is not assignable from the type
 	 */
-	public void registerHandlerFor(String type, TypeHandler handler) throws IllegalArgumentException {
+	public void registerHandlerFor(String type, TypeHandler handler) {
 		registerHandlerFor(type, handler, null);
 	}
 
@@ -283,7 +258,7 @@ public class TypeHandlerFactory {
 	 *                                  handler type is not assignable from the type
 	 * @since 2.0
 	 */
-	public void registerHandlerFor(String type, TypeHandler handler, String format) throws IllegalArgumentException {
+	public void registerHandlerFor(String type, TypeHandler handler, String format) {
 		if (type == null) {
 			throw new NullPointerException();
 		}
@@ -308,7 +283,7 @@ public class TypeHandlerFactory {
 	 * @throws IllegalArgumentException if the handler type is not assignable from
 	 *                                  the registered class type
 	 */
-	public void registerHandlerFor(Class<?> clazz, TypeHandler handler) throws IllegalArgumentException {
+	public void registerHandlerFor(Class<?> clazz, TypeHandler handler) {
 		registerHandlerFor(clazz, handler, null);
 	}
 
@@ -322,7 +297,7 @@ public class TypeHandlerFactory {
 	 * @throws IllegalArgumentException if the handler type is not assignable from
 	 *                                  the registered class type
 	 */
-	public void registerHandlerFor(Class<?> clazz, TypeHandler handler, String format) throws IllegalArgumentException {
+	public void registerHandlerFor(Class<?> clazz, TypeHandler handler, String format) {
 		if (clazz == null) {
 			throw new NullPointerException();
 		}

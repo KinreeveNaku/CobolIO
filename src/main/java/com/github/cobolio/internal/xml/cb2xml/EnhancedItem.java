@@ -34,109 +34,109 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 //@JsonPropertyOrder(value = {})
 public final class EnhancedItem {
 	@XmlElement(name = "condition")
-	protected List<Condition> conditions;
+	List<Condition> conditions;
 	@XmlElement(name = "item")
-	protected List<EnhancedItem> items;
+	List<EnhancedItem> items;
 	@XmlAttribute(name = "assumed-digits")
-	protected Integer assumedDigits;
+	Integer assumedDigits;
 	@XmlAttribute(name = "depending-on")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "token")
 	@JsonAlias("depending-on")
-	protected String dependingOn;
+	String dependingOn;
 	@XmlAttribute(name = "display-length", required = true)
 	@JsonAlias("display-length")
-	protected int displayLength;
+	int displayLength;
 	@XmlAttribute(name = "editted-numeric")
 	@JsonAlias("editted-numeric")
-	protected Boolean edittedNumeric;
+	Boolean edittedNumeric;
 	@XmlAttribute(name = "inherited-usage")
 	@JsonAlias("inherited-usage")
-	protected Boolean inheritedUsage;
+	Boolean inheritedUsage;
 	@XmlAttribute(name = "insert-decimal-point")
 	@JsonAlias("insert-decimal-point")
-	protected Boolean insertDecimalPoint;
+	Boolean insertDecimalPoint;
 	@XmlAttribute(name = "justified")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "token")
 	@JsonAlias("justified")
-	protected String justified;
+	String justified;
 	@XmlAttribute(name = "level", required = true)
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "token")
 	@JsonAlias("level")
-	protected String level;
+	String level;
 	@XmlAttribute(name = "name", required = true)
 	@XmlSchemaType(name = "anySimpleType")
 	@JsonAlias("name")
-	protected String name;
+	String name;
 	@XmlAttribute(name = "numeric")
 	@JsonAlias("numeric")
-	protected Boolean numeric;
+	Boolean numeric;
 	@XmlAttribute(name = "occurs")
 	@JsonAlias("occurs")
-	protected Integer occurs;
+	Integer occurs;
 	@XmlAttribute(name = "occurs-min")
 	@JsonAlias("occurs-min")
-	protected Integer occursMin;
+	Integer occursMin;
 	@XmlAttribute(name = "picture")
 	@XmlSchemaType(name = "anySimpleType")
 	@JsonAlias("picture")
-	protected String picture;
+	String picture;
 	@XmlAttribute(name = "position", required = true)
 	@JsonAlias("position")
-	protected int position;
+	int position;
 	@XmlAttribute(name = "redefined")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "token")
 	@JsonAlias("redefined")
-	protected String redefined;
+	String redefined;
 	@XmlAttribute(name = "redefines")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "token")
 	@JsonAlias("redefines")
-	protected String redefines;
+	String redefines;
 	@XmlAttribute(name = "scale")
 	@JsonAlias("scale")
-	protected Integer scale;
+	Integer scale;
 	@XmlAttribute(name = "sign-position")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "token")
 	@JsonAlias("sign-position")
-	protected String signPosition;
+	String signPosition;
 	@XmlAttribute(name = "sign-separate")
 	@JsonAlias("sign-separate")
-	protected Boolean signSeparate;
+	Boolean signSeparate;
 	@XmlAttribute(name = "signed")
 	@JsonAlias("signed")
-	protected Boolean signed;
+	Boolean signed;
 	@XmlAttribute(name = "signShown")
 	@JsonAlias("signShown")
-	protected Boolean signShown;
+	Boolean signShown;
 	@XmlAttribute(name = "storage-length", required = true)
 	@JsonAlias("storage-length")
-	protected int storageLength;
+	int storageLength;
 	@XmlAttribute(name = "sync")
 	@JsonAlias("sync")
-	protected Boolean sync;
+	Boolean sync;
 	@XmlAttribute(name = "usage")
 	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
 	@XmlSchemaType(name = "token")
 	@JsonAlias("usage")
-	protected String usage;
+	String usage;
 	@XmlAttribute(name = "value")
 	@XmlSchemaType(name = "anySimpleType")
 	@JsonAlias("value")
-	protected String value;
+	String value;
 	@XmlAttribute(name = "field-path")
 	@JsonAlias("fieldPath")
-	protected String fieldPath;
+	String fieldPath;
 	@XmlAttribute(name = "can-concatenate")
 	@JsonAlias("canConcatenate")
-	protected boolean canConcatenate;
+	boolean canConcatenate;
 	@XmlAttribute(name = "concatenation-type")
 	@JsonAlias("concatenationType")
-	protected Class<?> concatenationType;
+	Class<?> concatenationType;
 	/**
 	 * Available on groups. If enabled, The group will have its contents
 	 * concatenated into the destination type. Recommended primarily for
@@ -144,7 +144,7 @@ public final class EnhancedItem {
 	 */
 	@XmlAttribute(name = "same-level-concatenating")
 	@JsonAlias("sameLevelConcatenating")
-	protected Boolean sameLevelConcatenating;
+	Boolean sameLevelConcatenating;
 
 	public List<EnhancedItem> getItems() {
 		if (this.items == null) {

@@ -7,10 +7,14 @@ package com.github.cobolio.types;
  * 
  *
  * A <tt>TypeHandler</tt> is used to convert field text into a Java object and
- * vice versa.
+ * vice versa. Each instance is a representation of a particular field, and as
+ * such, may contain specific data that is only valid to that field. Using
+ * instances on fields other than what they were generated for will have
+ * undefined results
  * <p>
  * Implementations should be thread-safe if multiple threads may concurrently
  * process the same stream type.
+ * 
  * @author Andrew
  */
 public interface TypeHandler {
@@ -31,7 +35,7 @@ public interface TypeHandler {
 	 * @return the parsed Java object
 	 * @throws TypeConversionException if the text cannot be parsed
 	 */
-	Object parse(String text) throws TypeConversionException;
+	Object parse(byte[] text) throws TypeConversionException;
 
 	/**
 	 * Formats a Java object into field text.
@@ -40,7 +44,7 @@ public interface TypeHandler {
 	 * @return the formatted field text, or <tt>null</tt> to indicate the value is
 	 *         not present, or {@link #NIL} for XML formatted streams
 	 */
-	String format(Object value);
+	byte[] format(Object value);
 
 	/**
 	 * Returns the class type supported by this handler. Primitive types should not

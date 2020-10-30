@@ -1,9 +1,10 @@
-#Need to exclude javadoc js from sonar scan
-name: Build
+#Need to exclude javadoc from sonar scan
+name: Sonar Scan
 on:
   push:
     branches:
     - master
+    - develop
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:

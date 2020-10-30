@@ -42,6 +42,6 @@ public final class BitMasks {
 	public static final byte XF0 = (byte) 240;
 
 	private BitMasks() {
-		throw new IllegalArgumentException();
+		throw new IllegalAccessError();
 	}
 }

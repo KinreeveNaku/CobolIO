@@ -1,0 +1,415 @@
+<p>
+	A <a class="mw-redirect" title="Single precision">single-precision</a>
+	binary floating-point number (called "short" by IBM) is stored in a
+	32-bit word:
+</p>
+<dl>
+	<dd>
+		<table>
+
+			<tbody>
+				<tr style="text-align: center">
+					<td style="width: 20px">1</td>
+					<td style="width: 20px"></td>
+					<td style="width: 50px">7</td>
+					<td style="width: 20px"></td>
+					<td style="width: 20px"></td>
+					<td style="width: 210px">24</td>
+					<td style="width: 20px"></td>
+					<td style="text-align: left"><em>(width in bits)</em></td>
+				</tr>
+				<tr style="text-align: center">
+					<td colspan="1" style="text-align: center; background-color: #FC9">S</td>
+					<td colspan="3" style="text-align: center; background-color: #99F">Exp</td>
+					<td colspan="3" style="text-align: center; background-color: #9F9">Fraction
+					</td>
+					<td colspan="1" style="text-align: center; background-color: #FFF">&nbsp;</td>
+				</tr>
+				<tr style="text-align: center">
+					<td>31</td>
+					<td>30</td>
+					<td>...</td>
+					<td>24</td>
+					<td>23</td>
+					<td>...</td>
+					<td>0</td>
+					<td style="text-align: left"><em>(bit index)</em>*</td>
+				</tr>
+				<tr>
+					<td colspan="8"><em>* IBM documentation numbers the bits
+							from left to right, so that the most significant bit is
+							designated as bit number 0.</em></td>
+				</tr>
+			</tbody>
+		</table>
+	</dd>
+</dl>
+<p>In this format the initial bit is not suppressed, and the radix
+	point is set to the left of the significand (fraction in IBM
+	documentation and the figures) in increments of 4 bits.</p>
+<p>Since the base is 16, the exponent in this form is about twice as
+	large as the equivalent in IEEE 754, in order to have similar exponent
+	range in binary, 9 exponent bits would be required.</p>
+<h3>
+	<span id="Example">Example</span>
+</h3>
+<p>Consider encoding the value −118.625 as an IBM single-precision
+	floating-point value.</p>
+<p>The value is negative, so the sign bit is 1.</p>
+<p>
+	The value 118.625<sub>10</sub> in binary is 1110110.101<sub>2</sub>.
+	This value is normalized by moving the radix point left four bits (one
+	hexadecimal digit) at a time until the leftmost digit is zero, yielding
+	0.01110110101<sub>2</sub>. The remaining rightmost digits are padded
+	with zeros, yielding a 24-bit fraction of
+	.0111&nbsp;0110&nbsp;1010&nbsp;0000&nbsp;0000&nbsp;0000<sub>2</sub>.
+</p>
+<p>
+	The normalized value moved the radix point two digits to the left,
+	yielding a multiplier and exponent of 16<sup>+2</sup>. A bias of +64 is
+	added to the exponent (+2), yielding +66, which is 100&nbsp;0010<sub>2</sub>.
+</p>
+<p>Combining the sign, exponent plus bias, and normalized fraction
+	produces this encoding:</p>
+<dl>
+	<dd>
+		<table>
+
+			<tbody>
+				<tr style="text-align: center">
+					<td style="width: 20px; text-align: center; background-color: #FC9">S
+					</td>
+					<td style="width: 90px; text-align: center; background-color: #99F">Exp
+					</td>
+					<td
+						style="width: 250px; text-align: center; background-color: #9F9">Fraction
+					</td>
+					<td style="text-align: center; background-color: #FFF">&nbsp;
+					</td>
+				</tr>
+				<tr style="text-align: center">
+					<td style="text-align: center; background-color: #FEC">1
+					</td>
+					<td style="text-align: center; background-color: #CCF">100
+							0010</td>
+					<td style="text-align: center; background-color: #CFC">0111
+							0110 1010 0000 0000 0000</td>
+					<td style="text-align: center; background-color: #FFF">&nbsp;
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</dd>
+</dl>
+<p>
+	In other words, the number represented is −0.76A000<sub>16</sub> × 16<sup>66
+		− 64</sup> = −0.4633789… × 16<sup>+2</sup> = −118.625
+</p>
+<h3>
+	<span id="Largest_representable_number">Largest representable
+		number</span>
+</h3>
+<dl>
+	<dd>
+		<table>
+
+			<tbody>
+				<tr style="text-align: center">
+					<td style="width: 20px; text-align: center; background-color: #FC9">S
+					</td>
+					<td style="width: 90px; text-align: center; background-color: #99F">Exp
+					</td>
+					<td
+						style="width: 250px; text-align: center; background-color: #9F9">Fraction
+					</td>
+					<td style="text-align: center; background-color: #FFF">&nbsp;
+					</td>
+				</tr>
+				<tr style="text-align: center">
+					<td style="text-align: center; background-color: #FEC">0
+					</td>
+					<td style="text-align: center; background-color: #CCF">111
+							1111</td>
+					<td style="text-align: center; background-color: #CFC">1111
+							1111 1111 1111 1111 1111</td>
+					<td style="text-align: center; background-color: #FFF">&nbsp;
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</dd>
+</dl>
+<p>
+	The number represented is +0.FFFFFF<sub>16</sub> × 16<sup>127 −
+		64</sup> = (1 − 16<sup>−6</sup>) × 16<sup>63</sup> ≈ +7.2370051 × 10<sup>75</sup>
+</p>
+<h3>
+	<span id="Smallest_positive_normalized_number">Smallest positive
+		normalized number</span>
+</h3>
+<dl>
+	<dd>
+		<table>
+
+			<tbody>
+				<tr style="text-align: center">
+					<td style="width: 20px; text-align: center; background-color: #FC9">S
+					</td>
+					<td style="width: 90px; text-align: center; background-color: #99F">Exp
+					</td>
+					<td
+						style="width: 250px; text-align: center; background-color: #9F9">Fraction
+					</td>
+					<td style="text-align: center; background-color: #FFF">&nbsp;
+					</td>
+				</tr>
+				<tr style="text-align: center">
+					<td style="text-align: center; background-color: #FEC">0
+					</td>
+					<td style="text-align: center; background-color: #CCF">000
+							0000</td>
+					<td style="text-align: center; background-color: #CFC">0001
+							0000 0000 0000 0000 0000</td>
+					<td style="text-align: center; background-color: #FFF">&nbsp;
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</dd>
+</dl>
+<p>
+	The number represented is +0.1<sub>16</sub> × 16<sup>0 − 64</sup> = 16<sup>−1</sup>
+	× 16<sup>−64</sup> ≈ +5.397605 × 10<sup>−79</sup>.
+</p>
+<h3>
+	<span id="Zero">Zero</span>
+</h3>
+<dl>
+	<dd>
+		<table>
+
+			<tbody>
+				<tr style="text-align: center">
+					<td style="width: 20px; text-align: center; background-color: #FC9">S
+					</td>
+					<td style="width: 90px; text-align: center; background-color: #99F">Exp
+					</td>
+					<td
+						style="width: 250px; text-align: center; background-color: #9F9">Fraction
+					</td>
+					<td style="text-align: center; background-color: #FFF">&nbsp;
+					</td>
+				</tr>
+				<tr style="text-align: center">
+					<td style="text-align: center; background-color: #FEC">0
+					</td>
+					<td style="text-align: center; background-color: #CCF">000
+							0000</td>
+					<td style="text-align: center; background-color: #CFC">0000
+							0000 0000 0000 0000 0000</td>
+					<td style="text-align: center; background-color: #FFF">&nbsp;
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</dd>
+</dl>
+<p>
+	Zero (0.0) is represented in normalized form as all zero bits, which is
+	arithmetically the value +0.0<sub>16</sub> × 16<sup>0 − 64</sup> = +0 ×
+	16<sup>−64</sup> ≈ +0.000000 × 10<sup>−79</sup> = 0. Given a fraction
+	of all-bits zero, any combination of positive or negative sign bit and
+	a non-zero biased exponent will yield a value arithmetically equal to
+	zero. However, the normalized form generated for zero by CPU hardware
+	is all-bits zero. This is true for all three floating-point precision
+	formats.
+</p>
+<h3>
+	<span id="Precision_issues">Precision issues</span>
+</h3>
+<p>Since the base is 16, there can be up to three leading zero bits
+	in the binary significand. That means when the number is converted into
+	binary, there can be as few as 21 bits of precision. Because of the
+	"wobbling precision" effect, this can cause some calculations to be
+	very inaccurate.</p>
+<p>
+	A good example of the inaccuracy is representation of decimal value
+	0.1. It has no exact binary or hexadecimal representation. In
+	hexadecimal format, it is represented as 0.19999999...<sub>16</sub> or
+	0.0001 1001 1001 1001 1001 1001 1001...<sub>2</sub>, that is:
+</p>
+<dl>
+	<dd>
+		<table>
+
+			<tbody>
+				<tr style="text-align: center">
+					<th id="32bitPrecisionSignTH" style="width: 20px; text-align: center; background-color: #FC9">S</th>
+					<th id="32bitPrecisionExponentTH" style="width: 90px; text-align: center; background-color: #99F">Exp</th>
+					<th id="32bitPrecisionFractionTH" style="width: 250px; text-align: center; background-color: #9F9">Fraction</th>
+					<th id="32bitPrecisionBlankTH" style="text-align: center; background-color: #FFF">&nbsp;</th>
+				</tr>
+				<tr style="text-align: center">
+					<td style="text-align: center; background-color: #FEC">0
+					</td>
+					<td style="text-align: center; background-color: #CCF">100
+							0000</td>
+					<td style="text-align: center; background-color: #CFC">0001
+							1001 1001 1001 1001 1010</td>
+					<td style="text-align: center; background-color: #FFF">&nbsp;
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</dd>
+</dl>
+<p>This has only 21 bits, whereas the binary version has 24 bits of
+	precision.</p>
+<p>
+	Six hexadecimal digits of precision is roughly equivalent to six
+	decimal digits (i.e. (6 − 1) log<sub>10</sub>(16) ≈ 6.02). A conversion
+	of single precision hexadecimal float to decimal string would require
+	at least 9 significant digits (i.e. 6 log<sub>10</sub>(16) + 1 ≈ 8.22)
+	in order to convert back to the same hexadecimal float value.
+</p>
+<h2>
+	<span id="Double-precision_64-bit">Double-precision 64-bit</span>
+</h2>
+<p>
+	The <a title="Double precision">double-precision</a> floating-point
+	format (called "long" by IBM) is the same as the "short" format except
+	that the fraction field is wider and the double-precision number is
+	stored in a double word (8 bytes):
+</p>
+<dl>
+	<dd>
+		<table>
+
+			<tbody>
+				<tr style="text-align: center">
+					<td style="width: 20px">1</td>
+					<td style="width: 20px"></td>
+					<td style="width: 50px">7</td>
+					<td style="width: 20px"></td>
+					<td style="width: 20px"></td>
+					<td style="width: 320px">56</td>
+					<td style="width: 20px"></td>
+					<td style="text-align: left"><em>(width in bits)</em></td>
+				</tr>
+				<tr style="text-align: center">
+					<td colspan="1" style="text-align: center; background-color: #FC9">S</td>
+					<td colspan="3" style="text-align: center; background-color: #99F">Exp</td>
+					<td colspan="3" style="text-align: center; background-color: #9F9">Fraction
+					</td>
+					<td colspan="1" style="text-align: center; background-color: #FFF">&nbsp;</td>
+				</tr>
+				<tr style="text-align: center">
+					<td>63</td>
+					<td>62</td>
+					<td>...</td>
+					<td>56</td>
+					<td>55</td>
+					<td>...</td>
+					<td>0</td>
+					<td style="text-align: left"><em>(bit index)</em>*</td>
+				</tr>
+				<tr>
+					<td colspan="8"><em>* IBM documentation numbers the bits
+							from left to right, so that the most significant bit is
+							designated as bit number 0.</em></td>
+				</tr>
+			</tbody>
+		</table>
+	</dd>
+</dl>
+<p>The exponent for this format covers only about a quarter of the
+	range as the corresponding IEEE binary format.</p>
+<p>14 hexadecimal digits of precision is roughly equivalent to 17
+	decimal digits. A conversion of double precision hexadecimal float to
+	decimal string would require at least 18 significant digits in order to
+	convert back to the same hexadecimal float value.</p>
+<h2>
+	<span id="Extended-precision_128-bit">Extended-precision 128-bit</span>
+</h2>
+<p>
+	Called extended-precision by IBM, a <a
+		title="Quadruple precision floating-point format">quadruple-precision</a>
+	floating-point format was added to the System/370 series and was
+	available on some S/360 models (S/360-85, -195, and others by special
+	request or simulated by OS software). The extended-precision fraction
+	field is wider, and the extended-precision number is stored as two
+	double words (16 bytes):
+</p>
+<dl>
+	<dd>
+		<table>
+
+			<tbody>
+				<tr>
+					<td colspan="8"><strong>High-order part</strong></td>
+				</tr>
+				<tr style="text-align: center">
+					<td style="width: 20px">1</td>
+					<td style="width: 20px"></td>
+					<td style="width: 50px">7</td>
+					<td style="width: 20px"></td>
+					<td style="width: 20px"></td>
+					<td style="width: 320px">56</td>
+					<td style="width: 20px"></td>
+					<td style="text-align: left"><em>(width in bits)</em></td>
+				</tr>
+				<tr style="text-align: center">
+					<td colspan="1" style="text-align: center; background-color: #FC9">S</td>
+					<td colspan="3" style="text-align: center; background-color: #99F">Exp</td>
+					<td colspan="3" style="text-align: center; background-color: #9F9">Fraction
+						(high-order 14 digits)</td>
+					<td colspan="1" style="text-align: center; background-color: #FFF">&nbsp;</td>
+				</tr>
+				<tr style="text-align: center">
+					<td>127</td>
+					<td>126</td>
+					<td>...</td>
+					<td>120</td>
+					<td>119</td>
+					<td>...</td>
+					<td>64</td>
+					<td style="text-align: left"><em>(bit index)</em>*</td>
+				</tr>
+				<tr>
+					<td colspan="8"><strong>Low-order part</strong></td>
+				</tr>
+				<tr style="text-align: center">
+					<td colspan="4">8</td>
+					<td></td>
+					<td>56</td>
+					<td></td>
+					<td style="text-align: left"><em>(width in bits)</em></td>
+				</tr>
+				<tr style="text-align: center">
+					<td colspan="4" style="text-align: center; background-color: #CCC">Unused</td>
+					<td colspan="3" style="text-align: center; background-color: #9F9">Fraction
+						(low-order 14 digits)</td>
+					<td colspan="1" style="text-align: center; background-color: #FFF">&nbsp;</td>
+				</tr>
+				<tr style="text-align: center">
+					<td>63</td>
+					<td colspan="2">...</td>
+					<td>56</td>
+					<td>55</td>
+					<td>...</td>
+					<td>0</td>
+					<td style="text-align: left"><em>(bit index)</em>*</td>
+				</tr>
+				<tr>
+					<td colspan="8"><em>* IBM documentation numbers the bits
+							from left to right, so that the most significant bit is
+							designated as bit number 0.</em></td>
+				</tr>
+			</tbody>
+		</table>
+	</dd>
+</dl>
+<p>28 hexadecimal digits of precision is roughly equivalent to 32
+	decimal digits. A conversion of extended precision hexadecimal float to
+	decimal string would require at least 35 significant digits in order to
+	convert back to the same hexadecimal float value.</p>

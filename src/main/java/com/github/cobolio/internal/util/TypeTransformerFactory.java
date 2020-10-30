@@ -11,6 +11,7 @@ import com.github.cobolio.types.transform.ConfigurableTypeTransformer;
 import com.github.cobolio.types.transform.TypeTransformer;
 
 /**
+ * Pulled from org.beanio.
  * @author Andrew
  *
  */
@@ -76,7 +77,7 @@ public class TypeTransformerFactory {
 	 *         transformer registered for the name
 	 * @throws IllegalArgumentException if a custom property value was invalid
 	 */
-	public TypeTransformer getTypeTransformer(String name, Properties properties) throws IllegalArgumentException {
+	public TypeTransformer getTypeTransformer(String name, Properties properties) {
 		if (name == null) {
 			throw new NullPointerException();
 		}
@@ -126,8 +127,7 @@ public class TypeTransformerFactory {
 	 * @throws IllegalArgumentException if a custom property value was invalid
 	 * @since 2.0
 	 */
-	public TypeTransformer getTypeTransformerFor(String type, String format, Properties properties)
-			throws IllegalArgumentException {
+	public TypeTransformer getTypeTransformerFor(String type, String format, Properties properties) {
 		if (type == null) {
 			throw new NullPointerException();
 		}
@@ -174,8 +174,7 @@ public class TypeTransformerFactory {
 		return getHandler(TYPE_KEY + clazz.getName(), format, properties);
 	}
 
-	private TypeTransformer getHandler(String key, String format, Properties properties)
-			throws IllegalArgumentException {
+	private TypeTransformer getHandler(String key, String format, Properties properties) {
 		TypeTransformer transformer = null;
 		TypeTransformerFactory factory = this;
 		while (factory != null) {
@@ -234,7 +233,7 @@ public class TypeTransformerFactory {
 	 *                                  transformer type is not assignable from the
 	 *                                  type
 	 */
-	public void registerHandlerFor(String type, TypeTransformer transformer) throws IllegalArgumentException {
+	public void registerHandlerFor(String type, TypeTransformer transformer) {
 		registerHandlerFor(type, transformer, null);
 	}
 
@@ -252,8 +251,7 @@ public class TypeTransformerFactory {
 	 *                                  transformer type is not assignable from the
 	 *                                  type
 	 */
-	public void registerHandlerFor(String type, TypeTransformer transformer, String format)
-			throws IllegalArgumentException {
+	public void registerHandlerFor(String type, TypeTransformer transformer, String format) {
 		if (type == null) {
 			throw new NullPointerException();
 		}
@@ -278,7 +276,7 @@ public class TypeTransformerFactory {
 	 * @throws IllegalArgumentException if the transformer type is not assignable
 	 *                                  from the registered class type
 	 */
-	public void registerHandlerFor(Class<?> clazz, TypeTransformer transformer) throws IllegalArgumentException {
+	public void registerHandlerFor(Class<?> clazz, TypeTransformer transformer) {
 		registerHandlerFor(clazz, transformer, null);
 	}
 

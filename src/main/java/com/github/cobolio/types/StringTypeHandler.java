@@ -3,6 +3,18 @@
  */
 package com.github.cobolio.types;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.UnsupportedCharsetException;
+
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
+
 /**
  * 
  * 
@@ -11,9 +23,75 @@ package com.github.cobolio.types;
  * @author Andrew
  */
 public class StringTypeHandler implements TypeHandler {
-
+	private static final Logger LOGGER = (Logger) LoggerFactory.getLogger(StringTypeHandler.class);
+	private static final byte[] EMPTY = new byte[0];
+	Charset charset;
+	CharsetDecoder decoder;
+	CharsetEncoder encoder;
 	private boolean trim = false;
 	private boolean nullIfEmpty = false;
+
+	/**
+	 * The charset is assumed to be the current default system charset.
+	 */
+	public StringTypeHandler() {
+		this.charset = Charset.defaultCharset();
+		this.encoder = this.charset.newEncoder();
+		this.decoder = this.charset.newDecoder();
+		if(!this.charset.canEncode()) {
+			throw new UnsupportedCharsetException(this.charset.name());
+		}
+	}
+
+	/**
+	 * 
+	 * @param charset The charset to interpret the bytes with.
+	 */
+	public StringTypeHandler(Charset charset) {
+		this.charset = charset == null ? Charset.defaultCharset() : charset;
+		this.encoder = this.charset.newEncoder();
+		this.decoder = this.charset.newDecoder();
+		if(!this.charset.canEncode()) {
+			throw new UnsupportedCharsetException(this.charset.name());
+		}
+	}
+
+	/**
+	 * The charset is assumed to be the current default system charset.
+	 * 
+	 * @param trim
+	 * @param nullIfEmpty Whether to treat empty strings as null. True to treat
+	 *                    empty as null, and false to treat them as empty strings.
+	 */
+	public StringTypeHandler(boolean trim, boolean nullIfEmpty) {
+		this.charset = Charset.defaultCharset();
+		this.trim = trim;
+		this.nullIfEmpty = nullIfEmpty;
+		encoder = this.charset.newEncoder();
+		decoder = this.charset.newDecoder();
+		if(!this.charset.canEncode()) {
+			throw new UnsupportedCharsetException(this.charset.name());
+		}
+	}
+
+	/**
+	 * 
+	 * @param charset     The charset to interpret the bytes with.
+	 * @param trim        Whether whitespace should be trimmed from the extremities
+	 *                    of the byte arrays.
+	 * @param nullIfEmpty Whether to treat empty strings as null. True to treat
+	 *                    empty as null, and false to treat them as empty strings.
+	 */
+	public StringTypeHandler(Charset charset, boolean trim, boolean nullIfEmpty) {
+		this.charset = charset == null ? Charset.defaultCharset() : charset;
+		this.trim = trim;
+		this.nullIfEmpty = nullIfEmpty;
+		this.encoder = this.charset.newEncoder();
+		this.decoder = this.charset.newDecoder();
+		if(!this.charset.canEncode()) {
+			throw new UnsupportedCharsetException(this.charset.name());
+		}
+	}
 
 	/**
 	 * Parses a <tt>String</tt> from the given text.
@@ -22,16 +100,18 @@ public class StringTypeHandler implements TypeHandler {
 	 * @return the parsed <tt>String</tt>
 	 */
 	@Override
-	public String parse(String text) {
+	public String parse(byte[] text) {
 		if (text != null) {
 			if (trim) {
-				text = text.trim();
+				text = trim(text);
+				
 			}
-			if (nullIfEmpty && text.length() == 0) {
-				text = null;
+			if (nullIfEmpty && text.length == 0) {
+				return null;
 			}
+			
 		}
-		return text;
+		return new String(text, this.charset);
 	}
 
 	/**
@@ -42,10 +122,17 @@ public class StringTypeHandler implements TypeHandler {
 	 *         <tt>null</tt>
 	 */
 	@Override
-	public String format(Object value) {
-		if (value == null)
-			return null;
-		return value.toString();
+	public byte[] format(Object value) {
+		if (value == null) {
+			return EMPTY.clone();
+		} else {
+			try {
+				return encoder.encode(CharBuffer.wrap(value.toString())).array();
+			} catch (CharacterCodingException e) {
+				LOGGER.warn("Encoding could not be performed.", e);
+				return EMPTY.clone();
+			}
+		}
 	}
 
 	/*
@@ -96,6 +183,10 @@ public class StringTypeHandler implements TypeHandler {
 	 */
 	public void setNullIfEmpty(boolean nullIfEmpty) {
 		this.nullIfEmpty = nullIfEmpty;
+	}
+
+	public byte[] trim(byte[] text) {
+		return new String(this.charset.decode(ByteBuffer.wrap(text)).array()).trim().getBytes(this.charset);
 	}
 
 }

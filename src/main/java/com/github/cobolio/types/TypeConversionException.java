@@ -37,4 +37,15 @@ public class TypeConversionException extends Exception {
 	public TypeConversionException(Throwable cause) {
 		super(cause);
 	}
+	
+	/**
+	 * 
+	 * @param provided The type provided by the caller.
+	 * @param expected The expected type or supertype.
+	 * @param cause the root cause
+	 */
+	public TypeConversionException(Class<?> provided, Class<?> expected, Throwable cause) {
+		super("Type expected did not match the type provided. Expected:[" + expected.getCanonicalName()
+				+ "], Provided:[" + provided.getCanonicalName() + "]", cause);
+	}
 }

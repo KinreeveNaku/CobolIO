@@ -81,18 +81,19 @@
 		<sonar.projectKey>KinreeveNaku_CobolIO</sonar.projectKey>
 		<sonar.organization>kinreevenaku-cobolio</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		<sonar.sources>./src/main/java/**</sonar.sources>
+		<sonar.tests>./src/test/java/**</sonar.tests>
 		<!-- CORE PROPERTIES -->
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<forceJavacCompilerUse>true</forceJavacCompilerUse>
-		<maven.test.skip>true</maven.test.skip>
+		<!-- <maven.test.skip>true</maven.test.skip> -->
 	</properties>
 	<dependencyManagement />
 
-	<dependencies><!-- <dependency> <groupId>com.igormaznitsa</groupId> <artifactId>jbbp</artifactId> 
-			<version>2.0.1</version> </dependency> -->
+	<dependencies>
 		<dependency>
 			<groupId>org.apache.avro</groupId>
 			<artifactId>avro</artifactId>

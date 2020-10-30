@@ -72,6 +72,46 @@ public final class ByteUtils {
 	        l >>= 8;
 	    }
 	    return result;
+	    
+	}
+	
+	public static byte[] longToBytes(long l, boolean bigEndian) {
+		byte[] result = new byte[8];
+		if(bigEndian) {
+		    for (int i = 7; i >= 0; i--) {
+		        result[i] = (byte)(l & 0xFF);
+		        l >>= 8;
+		    }
+		} else {
+			for(int i = 0; i < 8; i++) {
+				result[i] = (byte)(l & 0xFF);
+				l >>= 8;
+			}
+		}
+		return result;
+		/*
+	     * 
+	     * if (bigEndian) {//whether the order of bits should be reversed or not
+				result[0] = (byte) ((int) (l >> 56));
+				result[1] = (byte) ((int) (l >> 48));
+				result[2] = (byte) ((int) (l >> 40));
+				result[3] = (byte) ((int) (l >> 32));
+				result[4] = (byte) ((int) (l >> 24));
+				result[5] = (byte) ((int) (l >> 16));
+				result[6] = (byte) ((int) (l >> 8));
+				result[7] = (byte) ((int) l);
+			} else {
+				result[7] = (byte) ((int) (l >> 56));
+				result[6] = (byte) ((int) (l >> 48));
+				result[5] = (byte) ((int) (l >> 40));
+				result[4] = (byte) ((int) (l >> 32));
+				result[3] = (byte) ((int) (l >> 24));
+				result[2] = (byte) ((int) (l >> 16));
+				result[1] = (byte) ((int) (l >> 8));
+				result[0] = (byte) ((int) l);
+			}
+			return result;
+	     */
 	}
 	
 	public static byte getHighNibble(byte b) {
