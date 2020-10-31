@@ -1,0 +1,6 @@
+{
+	"Notes": {
+		"2020.09.18-10:00": "Perhaps consider storing all the handlers in a LinkedList or an Iterator to call them sequentially.",
+		"2020.10.27-12:04": "The Java access modifiers protected and private are not enforced when you use the Java Native Interface. Therefore a COBOL program could invoke a protected or private Java method that is not invocable from a Java client. This usage is not recommended."
+	}
+}

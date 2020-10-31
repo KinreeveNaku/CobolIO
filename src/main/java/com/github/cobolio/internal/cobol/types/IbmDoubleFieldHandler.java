@@ -3,9 +3,8 @@
  */
 package com.github.cobolio.internal.cobol.types;
 
-import static com.github.cobolio.internal.cobol.PrimitiveConstants.*;
-
-import java.util.Arrays;
+import static com.github.cobolio.internal.cobol.PrimitiveConstants.THREE;
+import static com.github.cobolio.internal.cobol.PrimitiveConstants.TWO;
 
 import com.github.cobolio.internal.cobol.ByteUtils;
 import com.github.cobolio.types.TypeConversionException;
@@ -330,10 +329,6 @@ public class IbmDoubleFieldHandler implements TypeHandler {
 			} else {
 				mantissa &= HFP_MANTISSA_MASK;
 			}
-			System.out.println("b2h s: " + sign);
-			System.out.println("b2h m: " + mantissa);
-			System.out.println("b2h b: " + bexponent);
-			System.out.println("b2h h: " + hexponent);
 			return sign | ((hexponent << HFP_MANTISSA_LENGTH) & HFP_EXPONENT_MASK) | (mantissa & HFP_MANTISSA_MASK);
 			// TODO incomplete. Also needs testing after
 		}
@@ -346,12 +341,12 @@ public class IbmDoubleFieldHandler implements TypeHandler {
 		 * if((binFpBits & NON_BIT64_SIGN_MASK) == 0) {//int s = ((bits >> 63) == 0) ? 1
 		 * : -1; return sign; } else {
 		 */
-			long bexponent = binFpBits & BFP_EXPONENT_MASK >> BFP_MANTISSA_LENGTH;//int bexponent = (int)((binFpBits >> 52) & 0x7FFL);
-			long mantissa = binFpBits & BFP_MANTISSA_MASK;//mantissa = (bexponent == 0) ? (binFpBits & 0xFFFFFFFFFFFFFL) << 1 : (binFpBits & 0xFFFFFFFFFFFFFL) | 0x10000000000000L;
+			long bexponent = binFpBits & BFP_EXPONENT_MASK >> BFP_MANTISSA_LENGTH;//this may be replaceable with int bexponent = (int)((binFpBits >> 52) & 0x7FFL)
+			long mantissa = binFpBits & BFP_MANTISSA_MASK;//this may be replaceable with mantissa = (bexponent == 0) ? (binFpBits & 0xFFFFFFFFFFFFFL) << 1 : (binFpBits & 0xFFFFFFFFFFFFFL) | 0x10000000000000L
 			long hexponent = bexponent & HFP_EXPONENT_MASK;
 			long hmantissa = mantissa & HFP_MANTISSA_MASK;
 			double value = sign * (long) (hmantissa * (StrictMath.pow(2.0, (hexponent))));//s·m·2^e-1075
-			System.out.println(value);
+			System.out.println(value);//TODO Complete this method
 			
 			
 		//}
@@ -382,44 +377,5 @@ public class IbmDoubleFieldHandler implements TypeHandler {
 	@Override
 	public Class<?> getType() {
 		return Double.TYPE;
-	}
-
-	public static void main(String[] args) {
-		IbmDoubleFieldHandler handler = new IbmDoubleFieldHandler(0);
-		Double d = 120.023;
-		long bits = Double.doubleToLongBits(d);
-		System.out.println(Long.toBinaryString(bits));
-		//sexponen texpmant issamant issamant issamant issamant issamant issamant  bin
-		//01000000 01011110 00000001 01111000 11010100 11111101 11110011 10110110
-		//sexponen mantissa mantissa mantissa mantissa mantissa mantissa mantissa  hex
-		
-		handler.binToHexSlow(bits);
-	}
-	
-	// TODO Finish development and testing
-	public static void main2(String[] args) throws TypeConversionException {
-		IbmDoubleFieldHandler handler = new IbmDoubleFieldHandler(0);
-		byte[] aBytes = new byte[] { (byte) 0b10000000, 0b00000001, 0b00000011, 0b00011111, (byte) 0b11111111, (byte) 0b11111111,
-				(byte) 0b11111111, (byte) 0b11111111 };
-		
-		long aBits = ByteUtils.bytesAsLong(aBytes);
-		Double b = (Double) handler.parse(aBytes);
-		long bBits = Double.doubleToLongBits(b);
-		
-		byte[] bBytes = handler.format(b);
-		double a1 = Double.longBitsToDouble(ByteUtils.bytesAsLong(aBytes));
-		double a2 = Double.longBitsToDouble(ByteUtils.bytesAsLong(bBytes));
-		System.out.println("a : bin : " + Long.toBinaryString(aBits));
-		System.out.println("b : bin : " + Long.toBinaryString(bBits));
-		System.out.println("a : hex : " + Double.toHexString(a2));
-		System.out.println("b : hex : " + Double.toHexString(b));
-		System.out.println("a : bytes : " + Arrays.toString(aBytes));
-		System.out.println("b : bytes : " + Arrays.toString(bBytes));
-		if (aBytes.length == bBytes.length) {
-			System.out.println("b.length == c.length ? : " + (aBytes.length == bBytes.length));
-			for (int i = 0; i < aBytes.length; i++) {
-				System.out.println("index[" + i + "] are equal ? : " + (aBytes[i] == bBytes[i]));
-			}
-		}
 	}
 }

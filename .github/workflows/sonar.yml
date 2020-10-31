@@ -5,6 +5,11 @@ on:
     branches:
     - master
     - develop
+    - 'branch/*'
+    - 'bugfix/*'
+    - 'hotfix/*'
+    - 'release/*'
+    - '1.*'
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:

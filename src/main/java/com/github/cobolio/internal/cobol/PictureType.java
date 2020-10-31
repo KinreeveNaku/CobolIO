@@ -11,6 +11,7 @@ public enum PictureType {
 	
 	NUMERIC,
 	ALPHANUMERIC,
-	ALPHABETIC;
+	ALPHABETIC,
+	NONE;
 	
 }

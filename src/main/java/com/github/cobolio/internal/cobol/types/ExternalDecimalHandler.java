@@ -5,6 +5,7 @@ package com.github.cobolio.internal.cobol.types;
 
 import static com.github.cobolio.internal.cobol.PrimitiveConstants.*;
 
+import com.github.cobolio.internal.cobol.datatype.ExternalDecimal;
 import com.github.cobolio.types.TypeConversionException;
 import com.github.cobolio.types.TypeHandler;
 
@@ -14,7 +15,8 @@ import com.github.cobolio.types.TypeHandler;
  * less than actual precision depending on decimalType.</span>
  * 
  * @author Andrew
- *
+ * 
+ * @since 0.1.0-Alpha
  */
 public class ExternalDecimalHandler implements TypeHandler {
 
@@ -103,8 +105,7 @@ public class ExternalDecimalHandler implements TypeHandler {
 
 	@Override
 	public Class<?> getType() {
-		// TODO Auto-generated method stub
-		return null;
+		return ExternalDecimal.class;
 	}
 
 }
