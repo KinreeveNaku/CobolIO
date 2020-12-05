@@ -72,7 +72,13 @@ public final class PrimitiveConstants {
 	public static final byte SIXTYFOUR = 64;
 
 	// The high is 16 times the low. ((0b...0n00000) == (0b0n0 << 4)) and (4^2 == 16)
+	/**
+	 * Last bit of the low nibble
+	 */
 	public static final byte LOW_ONE = +0x01;// 16 / 1 = 16
+	/**
+	 * Last bit of the high nibble
+	 */
 	public static final byte HIGH_ONE = +0x10;
 	public static final byte LOW_TWO = +0x02;// 32 / 2 = 16
 	public static final byte HIGH_TWO = +0x20;
@@ -81,12 +87,21 @@ public final class PrimitiveConstants {
 	 * Low two bits of the high nibble
 	 */
 	public static final byte HIGH_THREE = +0x30;
+	/**
+	 * 3rd bit of the low nibble
+	 */
 	public static final byte LOW_FOUR = +0x04;// 64 / 4 = 16
+	/**
+	 * 3rd bit of the high nibble.
+	 */
 	public static final byte HIGH_FOUR = +0x40;
 	public static final byte LOW_FIVE = +0x05;// 80 / 5 = 16
 	public static final byte HIGH_FIVE = +0x50;
 	public static final byte LOW_SIX = +0x06;// 96 / 6 = 16
 	public static final byte HIGH_SIX = +0x60;
+	/**
+	 * Low three bits of the low nibble
+	 */
 	public static final byte LOW_SEVEN = +0x07;// 112 / 7 = 16
 	/**
 	 * Low three bits of the high nibble
@@ -106,29 +121,78 @@ public final class PrimitiveConstants {
 	public static final byte EXTERNAL_NEGATIVE_SIGN_SEPARATE = -48;
 	public static final byte EXTERNAL_NEGATIVE_SIGN_SEPARATE_OTHER = -80;
 	
+	/**
+	 * Value used internally to indicate that a byte array is storing it's sign byte
+	 * in the last relevant byte embedded.
+	 */
 	public static final int EBCDIC_SIGN_EMBEDDED_TRAILING = 1;
+	/**
+	 * Value used internally to indicate that a byte array is storing it's sign byte
+	 * in the first relevant byte embedded.
+	 */
 	public static final int EBCDIC_SIGN_EMBEDDED_LEADING = 2;
+	
+	/**
+	 * Value used internally to indicate that a byte array is storing it's sign byte
+	 * in the last relevant byte externally.
+	 */
 	public static final int EBCDIC_SIGN_SEPARATE_TRAILING = 3;
+	
+	/**
+	 * Value used internally to indicate that a byte array is storing it's sign byte
+	 * in the first relevant byte externally.
+	 */
 	public static final int EBCDIC_SIGN_SEPARATE_LEADING = 4;
 	
 	public static final byte PACKED_ZERO = 0;
 	public static final byte PACKED_SIGNED_ZERO = 12;
 	public static final byte PACKED_PLUS = 12;
 	public static final byte PACKED_MINUS = 13;
+	/**
+	 * Value representing 0x0F. Used in Packed Decimals as a sign indicator of
+	 * positive.
+	 */
 	public static final byte PACKED_ALT_PLUS = 15;
+	/**
+	 * Value representing 0x0E. Used in Packed Decimals as a sign indicator of
+	 * positive. This has specific implementation cases.
+	 */
 	public static final byte PACKED_ALT_PLUS1 = 14;
+	/**
+	 * Value representing 0x0A. Used in Packed Decimals as a sign indicator of
+	 * positive. This has specific implementation cases.
+	 */
 	public static final byte PACKED_ALT_PLUS2 = 10;
 	public static final byte PACKED_ALT_MINUS = 11;
 	public static final byte EXTERNAL_SIGN_PLUS = 78;
 	public static final byte EXTERNAL_SIGN_MINUS = 96;
 	public static final byte EXTERNAL_EMBEDDED_SIGN_PLUS = -64;
 	public static final byte EXTERNAL_EMBEDDED_SIGN_MINUS = -48;
+	/**
+	 * Value representing 0xA0. Used in External Decimals/Zoned Decimals as a sign indicator of positive.
+	 */
 	public static final byte EXTERNAL_EMBEDDED_SIGN_PLUS_ALTERNATE_A = -96;
+	/**
+	 * Value representing 0xE0. Used in External Decimals/Zoned Decimals as a sign indicator of positive.
+	 */
 	public static final byte EXTERNAL_EMBEDDED_SIGN_PLUS_ALTERNATE_E = -32;
+	/**
+	 * Value representing 0xF0. Used in External Decimals/Zoned Decimals as a sign indicator of positive.
+	 */
 	public static final byte EXTERNAL_EMBEDDED_SIGN_PLUS_ALTERNATE_F = -16;
+	/**
+	 * Value representing 0xB0. Used in External Decimals/Zoned Decimals as a sign indicator of positive.
+	 */
 	public static final byte EXTERNAL_EMBEDDED_SIGN_MINUS_ALTERNATE_B = -80;
+	/**
+	 * Value representing 0x0F. Used as a Low nibble mask for bytes.
+	 */
 	public static final byte LOW_NIBBLE_MASK = 15;
 	public static final byte BYTE_7F = 0x7F;
+	/**
+	 * Value representing 0xF0. Used as a High nibble mask for bytes, and also ORing
+	 * un-zoned bytes to zoned bytes.
+	 */
 	public static final byte HIGH_NIBBLE_MASK = -16;
 	public static final byte BIT_POS_128 = (byte) 0b10000000;
 	public static final byte BIT_POS_64 = 0b01000000;
@@ -139,14 +203,23 @@ public final class PrimitiveConstants {
 	public static final byte BIT_POS_2 = 0b00000010;
 	public static final byte BIT_POS_1 = 0b00000001;
 	
+	/**
+	 * Index in the ASCII table for '+'.
+	 */
 	public static final byte ASCII_PLUS = 43;
+	/**
+	 * Index in the ASCII table for '-'.
+	 */
 	public static final byte ASCII_MINUS = 45;
+	/**
+	 * Index in the ASCII table for '0';
+	 */
 	public static final byte ASCII_ZED = 48;
 
 	static final long U_MIN = 0L;
 
 	private PrimitiveConstants() {
-		throw new IllegalAccessError();
+		throw new IllegalStateException();
 	}
 
 }

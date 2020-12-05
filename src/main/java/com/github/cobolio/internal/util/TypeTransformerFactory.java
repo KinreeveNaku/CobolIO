@@ -291,8 +291,7 @@ public class TypeTransformerFactory {
 	 * @throws IllegalArgumentException if the transformer type is not assignable
 	 *                                  from the registered class type
 	 */
-	public void registerHandlerFor(Class<?> clazz, TypeTransformer transformer, String format)
-			throws IllegalArgumentException {
+	public void registerHandlerFor(Class<?> clazz, TypeTransformer transformer, String format) {
 		if (clazz == null) {
 			throw new NullPointerException();
 		}

@@ -123,6 +123,15 @@ public class PackedDecimal extends CobolNumber {
 		this.scale = n.scale();
 		this.decimalType = decimalType;
 	}
+	
+	public PackedDecimal(String str, int decimalType, boolean isSigned) {
+		super(isSigned);
+		this.jValue = new BigDecimal(str);
+		this.packedBytes = pack(this.jValue, decimalType);
+		this.precision = this.jValue.precision();
+		this.scale = this.jValue.scale();
+		this.decimalType = decimalType;
+	}
 
 	@Override
 	public int intValue() {
@@ -204,6 +213,7 @@ public class PackedDecimal extends CobolNumber {
 		return length(precision);
 		
 	}
+	
 	private static final int length(int precision) {
 		return (precision / HALF) + 1;
 	}
@@ -544,11 +554,8 @@ public class PackedDecimal extends CobolNumber {
 			throw new IllegalArgumentException();
 				
 		}
-		
-		
-		
-		
 	}
+	
 	/**
 	 * Returns the value of this PackedDecimal in String format.
 	 * This method simply calls the #toString() method of the BigDecimal class.

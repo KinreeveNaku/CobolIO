@@ -2,6 +2,7 @@ package com.github.cobolio.internal.xml.cb2xml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -50,6 +51,8 @@ public final class EnhancedItem {
 	@XmlAttribute(name = "editted-numeric")
 	@JsonAlias("editted-numeric")
 	Boolean edittedNumeric;
+	@XmlAttribute(name = "index")
+	int index;
 	@XmlAttribute(name = "inherited-usage")
 	@JsonAlias("inherited-usage")
 	Boolean inheritedUsage;
@@ -128,15 +131,15 @@ public final class EnhancedItem {
 	@XmlSchemaType(name = "anySimpleType")
 	@JsonAlias("value")
 	String value;
-	@XmlAttribute(name = "field-path")
-	@JsonAlias("fieldPath")
-	String fieldPath;
 	@XmlAttribute(name = "can-concatenate")
 	@JsonAlias("canConcatenate")
 	boolean canConcatenate;
 	@XmlAttribute(name = "concatenation-type")
 	@JsonAlias("concatenationType")
 	Class<?> concatenationType;
+	@XmlAttribute(name = "field-path")
+	@JsonAlias("fieldPath")
+	String fieldPath;
 	/**
 	 * Available on groups. If enabled, The group will have its contents
 	 * concatenated into the destination type. Recommended primarily for
@@ -198,6 +201,10 @@ public final class EnhancedItem {
 		return this.justified;
 	}
 
+	public int getIndex() {
+		return this.index;
+	}
+	
 	public String getLevel() {// Presumably can be parsed to an integer.
 		return this.level;
 	}
@@ -348,6 +355,10 @@ public final class EnhancedItem {
 		this.fieldPath = fieldPath;
 	}
 
+	public void setIndex(int index) {
+		this.index = index;
+	}
+	
 	void setInheritedUsage(Boolean value) {
 		this.inheritedUsage = value;
 	}
@@ -430,6 +441,25 @@ public final class EnhancedItem {
 
 	void setValue(String value) {
 		this.value = value;
+	}
+	
+	public String getJavaName() {
+		if(name == null) {
+			throw new NullPointerException("Name cannot be null.");
+		}
+		StringBuilder sb = new StringBuilder();
+		for( String subString : this.name.toLowerCase().split("_|-") )
+		{
+		    sb.append( subString.substring(0,1).toUpperCase() );
+		    sb.append( subString.substring(1) );
+		}
+		sb.setCharAt(0, Character.toLowerCase(sb.charAt(0)));
+		return sb.toString();
+	}
+	
+	public String getMethodSuffix() {
+		String i = getJavaName();
+		return i.substring(0, 1).toUpperCase() + i.substring(1, i.length());
 	}
 	
 	@Override

@@ -1,0 +1,83 @@
+#foreach($import in $imports)
+import ${import.getCanonicalName()};
+#end
+
+#foreach($annotation in $this.javaAnnotations($schema))
+@$annotation
+#end
+#*
+*#
+public class $className {
+
+#foreach($item in ${copybook.classVariables})
+  ${fieldVisibility.toString().toLowerCase()} String ${item.getJavaName()};
+#end
+
+
+	#if(${generateOptionalGetters} || ${gettersReturnOptional})
+	#foreach($item in ${copybook.classVariables})
+	public Optional<String> get${item.getMethodSuffix()}() {
+		return Optional.of(this.${item.getJavaName()});
+	}
+	#end
+	#else
+	public String get${item.getMethodSuffix()}() {
+		return this.${item.getJavaName()};
+	}
+	#end
+
+
+
+
+	/**
+	 * This method returns the value of the field at index <code>index</code>.
+	 * @return Returns the value of the field at this index.
+	 */
+	@Override
+	public java.lang.Object get(int index) {
+		switch(index) {
+		#foreach($item in ${copybook.classVariables})
+		case ${item.index} : {
+			return this.${item.getJavaName()};
+		}
+		#end
+		}
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/**
+	 * All child types must override {@link java.lang.Object#toString toString()}
+	 * to follow the contract required by cobolio.
+	 * @implNote This method should not be called excessively, especially when records are longer,
+	 * as this method can be potentially performance heavy. The best approach would be to call
+	 * this once and refer back to the returned value when it needs to be referred to again.
+	 * Needs cleaner syntax.
+	 */
+	 @Override
+	 public String toString() {
+	 	StringBuilder builder = new StringBuilder();
+	 	#foreach($property in ${copybook.classVariables})
+		 	#if(${property.class.isArray()})
+		 		builder.append(Arrays.deepToString(${property.getJavaName()}));
+		 	#else
+				builder.append(String.valueOf(${property.getJavaName()}));
+			#end
+		#end
+	}
+}

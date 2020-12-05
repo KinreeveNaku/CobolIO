@@ -55,12 +55,12 @@ public final class CobolTypeLogic {
 			E2U_LOOKUP[j + 1] = (byte) (48 | i);
 		}
 	}
-	
+
 	/**
 	 * 
 	 */
 	private CobolTypeLogic() {
-		throw new IllegalAccessError();
+		throw new IllegalStateException();
 	}
 
 	/*
@@ -113,37 +113,22 @@ public final class CobolTypeLogic {
 	public static int packedSignum(byte b) {
 		return getSign(b & LOW_NIBBLE_MASK) == PACKED_NEGATIVE_SIGN ? -1 : 1;
 	}
-	static BigDecimal slowSignedPackedDecimalToBigDecimal(byte[] byteArray, int offset, int precision, int scale) {
-		int length = (precision + LOW_TWO) / LOW_TWO;
+	public static BigDecimal slowSignedPackedDecimalToBigDecimal(byte[] byteArray, int offset, int precision, int scale) {
+		int length = (precision + TWO) / TWO;
 		int sign = byteArray[offset + length - 1] & LOW_NIBBLE_MASK;
-		char[] temp = new char[length * LOW_TWO];
+		char[] temp = new char[length * TWO];
 		temp[0] = (char) (sign != PACKED_NEGATIVE_SIGN && sign != PACKED_OTHER_NEGATIVE_SIGN ? ASCII_ZED : ASCII_MINUS);
 
 		for (int i = 0; i < length - 1; ++i) {
-			temp[LOW_TWO * i + 1] = (char) (ASCII_ZED + ((byteArray[i + offset] >>> NIBBLE_LENGTH) & (LOW_NIBBLE_MASK & 0xFF)));
-			temp[LOW_TWO * i + LOW_TWO] = (char) (ASCII_ZED + (byteArray[i + offset] & LOW_NIBBLE_MASK));
+			temp[TWO * i + 1] = (char) (ASCII_ZED + ((byteArray[i + offset] >>> NIBBLE_LENGTH) & (LOW_NIBBLE_MASK & 0xFF)));
+			temp[TWO * i + TWO] = (char) (ASCII_ZED + (byteArray[i + offset] & LOW_NIBBLE_MASK));
 		}
 
-		temp[length * LOW_TWO - 1] = (char) (HIGH_THREE + ((byteArray[offset + length - 1] >>> NIBBLE_LENGTH) & (LOW_NIBBLE_MASK & 0xFF)));
+		temp[length * TWO - 1] = (char) (HIGH_THREE + ((byteArray[offset + length - 1] >>> NIBBLE_LENGTH) & (LOW_NIBBLE_MASK & 0xFF)));
 		return new BigDecimal(new BigInteger(new String(temp)), scale);
 	}
 	
-	/*
-	 * public static void packedToBigDecimalCustom(BigDecimal bd, byte[] byteArray,
-	 * int precision, int scale, int decimalType) { byte signNibble; switch
-	 * (decimalType) { case EBCDIC_SIGN_EMBEDDED_TRAILING : signNibble = (byte)
-	 * (byteArray[byteArray.length - 1] & LOW_NIBBLE_MASK); break; case
-	 * EBCDIC_SIGN_EMBEDDED_LEADING : signNibble = (byte) (byteArray[0] &
-	 * HIGH_NIBBLE_MASK); break; case EBCDIC_SIGN_SEPARATE_TRAILING : signNibble =
-	 * byteArray[byteArray.length - 1]; break; case EBCDIC_SIGN_SEPARATE_LEADING :
-	 * signNibble = byteArray[0]; break; default : throw new
-	 * IllegalStateException("DecimalType is not recognized."); } int signext =
-	 * getSign(signNibble) == PACKED_POSITIVE_SIGN ? 1 : -1; char[] buffer = new
-	 * char[getPackedByteCount(precision)]; //TODO write deserialization logic. bd =
-	 * new BigDecimal(buffer,); value *= signext; bd.setScale(scale); }
-	 */
-	
-	static void bigDecimalToSignedPackedDecimal(BigDecimal bd, byte[] byteArray, int offset, int precision,
+	public static void bigDecimalToSignedPackedDecimal(BigDecimal bd, byte[] byteArray, int offset, int precision,
 			boolean checkOverflow) {
 		if (checkOverflow && precision < bd.precision()) {
 			throw new ArithmeticException("Decimal overflow - precision of result Packed Decimal lesser than BigDecimal precision");
@@ -165,6 +150,169 @@ public final class CobolTypeLogic {
 				byteArray[offset + index] = (byte) (buffer[0] - ASCII_ZED);
 			}
 
+		}
+	}
+	
+	/**
+	 * This method displays a simplified explanation of how COBOL Packed Decimal
+	 * value is converted into a Java datatype.
+	 * 
+	 * The overall process is to extract the sign nibble from the byte array, and
+	 * extract each of the digit nibbles, then interpret this data along with the
+	 * scale and precision.
+	 * 
+	 * The first step is to extract the sign. This can be done in one of two ways.
+	 * Either have some argument indicate where the sign nibble is and fetch it
+	 * directly, or extract it through an exhaustive search of the byte array. Both
+	 * have their inherent flaws.
+	 * 
+	 * The next step is to iteratively break down each of the bytes into nibbles in
+	 * the byte array, excluding the sign nibble, and convert them into numeric
+	 * symbols. There are countless ways to do this. After this is done, the numeric
+	 * symbols need to be sequentially joined to create one complete numeric
+	 * literal, with each of the decimal places being represented by its
+	 * corresponding nibble.
+	 * 
+	 * <pre>
+	 * Note: Assume precision is 15
+	 * 
+	 * [C8][32][18][56][23][99][17][40]
+	 *  ^^  ^^  ^^  ^^  ^^  ^^  ^^  ^^
+	 *  ||  ||  ||  ||  ||  ||  ||  ||
+	 *  V----------VVVVVV-------------
+	 *  S          Digits
+	 * </pre>
+	 * 
+	 * S is the sign nibble in this instance and Digits are the nibbles representing
+	 * each digit of the translated value In COBOL packed decimal logic, C is the
+	 * hexadecimal numeric for POSITIVE, so this value is positive. The final number
+	 * would be +832185623991740.
+	 * 
+	 * Depending on the precision, this could change slightly though. If the
+	 * precision is 14 for example, then that last nibble 0 should get skipped,
+	 * which would mean the translated value is actually +83218562399174 and a
+	 * precision of 15 would result in +832185623991740
+	 * 
+	 * Care must be taken when performing this logic however. Because if the sign
+	 * nibble is at the end, then under-developed logic could unintentionally
+	 * truncate the sign nibble. e.g.:
+	 * 
+	 * <pre>
+	 * [83][21][85][62][39][91][74][0C]
+	 * </pre>
+	 * 
+	 * leading to 832185623991740 where the precision is 14 and no sign. No error
+	 * would be thrown but the result is incorrect.
+	 * 
+	 * 
+	 * <div> Finally if the packed decimal value has a scale greater than 0, then
+	 * the decimal point must be correctly positioned to the proper location. So if
+	 * the value has a scale of 5 and a precision of 15, then the final value should
+	 * be </div>
+	 * 
+	 * <pre>
+	 * [83][21][85][62][39][91][74][0C] == +8321856239.91740
+	 * </pre>
+	 * 
+	 * 
+	 * @param bytes The byte[] containing the packed decimal value in its raw form.
+	 * @param scale The number of fractional digits
+	 * @return Returns a BigDecimal value representing the value stored as a Packed
+	 *         Decimal.
+	 * @category Confirmed
+	 */
+	public static final BigDecimal unpack(byte[] bytes, int scale) {//Needs precision argument for boundary support
+		//If sign byte high nibble is non-zero, precision must be taken into account
+		char sign = 0;
+		char[] chars = new char[(bytes.length * 2) + 1];//Rough approximation of precision. String trimming accounts for inaccuracy.
+		int i = 1;
+		for(byte b : bytes) {
+			if((b & 0xF0) > 0xA0) {//isSign, (? > A0) is any hexadecimal letter value for the HO Nibble
+				sign = packedSignum((byte) (b >> 4)) == 1 ? '+' : '-';//if sign nibble is 'C', return '+'. If sign nibble is B or D, return '-'. 
+				chars[i] = (char) ((b & 0x0F) + 48);//Get LO Nibble and convert to ASCII numeric.
+				i++;
+			} else if((b & 0x0F) > 0x0A) {//isSign, 0A is any hexadecimal letter value for the LO Nibble
+				sign = packedSignum(b) == 1 ? '+' : '-';//if sign nibble is 'C', return '+'. If sign nibble is B or D, return '-'.
+				chars[i] = (char) (((b & 0xF0) >> 4) + 48);//Get HO Nibble and convert to ASCII numeric.
+				i++;
+			} else {//Not a sign byte, perform standard handling.
+				chars[i] = (char) (((b & 0xF0) >> 4) + 48);//Get HO Nibble and convert to ASCII numeric.
+				i++;
+				chars[i] = (char) ((b & 0x0F) + 48);//Get LO Nibble and convert to ASCII numeric.
+				i++;
+			}
+		}
+		chars[0] = sign != 0 ? sign : '+';//set start of string to the interpolated sign.
+		return new BigDecimal(new BigInteger(new String(chars).trim()), scale);//convert to unscaled BigInteger, and then to scaled BigDecimal.
+	}
+	
+	public static byte[] pack(Number n, int decimalType) {
+		String unpackedString;
+		if(n instanceof BigDecimal) {
+			unpackedString = ((BigDecimal) n).toPlainString();
+		} else {
+			unpackedString = n.toString();
+		}
+		if(unpackedString.contains(".")) {
+			unpackedString = unpackedString.substring(0, unpackedString.indexOf('.')).concat(unpackedString.substring(unpackedString.indexOf('.') + 1));
+		}
+		int decant = (unpackedString.contains("+") || unpackedString.contains("-")) ? 1 : 0;
+		char[] chars = unpackedString.toCharArray();
+		byte[] bytes = new byte[((unpackedString.length() - decant) / TWO) + 1];//The byte array that will be returned
+		byte[] nibbles = new byte[unpackedString.length()];//An array containing each individual nibble as its own byte value
+		int signPosition = signPositionByType(decimalType, nibbles.length);
+		for(int i = 0, j = 0; i < chars.length; i++, j++) {
+			if(chars[i] == '+') {
+				nibbles[signPosition] = 0x0F;//If the character is +, then set the sign nibble to F
+				//below we are decrementing the nibbles array index back one so we don't skip over an index without storing anything 
+				j--;//TODO How can this be moved back into the for loop logic
+				
+			} else if(chars[i] == '-') {
+				nibbles[signPosition] = 0x0D;//If the character is -, then set the sign nibble to D
+				//below we are decrementing the nibbles array index back one so we don't skip over an index without storing anything
+				j--;//TODO How can this be moved back into the for loop logic
+			} else if(chars[i] == '.') {//If the character is '.', disregard it 
+				//Just skip it
+			} else {
+				//Assuming contents were checked, this must be a numeric ascii character, so subtracting 48 will give us the corresponding binary representation of this character.
+				nibbles[j] = (byte) (chars[i] - 48);
+			}
+		}
+		//FIXED Correct until here...
+		int i = 0;
+		int j = 0;
+		while(i < nibbles.length) {
+			if(i % 2 == 0) {//true if i is even
+				//Flip-flopping between the high order and low order nibble of each byte in 'bytes'.
+				bytes[j] = (byte) ((bytes[j] & 0x0F) |(byte) (nibbles[i] << 4));
+			} else {//true if i is odd
+				bytes[j] = (byte) ((bytes[j] & 0xF0) | nibbles[i]);
+				j++;//This is the low order byte, so increment to the next byte on the next iteration
+			}
+			i++;//increment to the next nibble position on the next iteration
+		}
+		return bytes;
+	}
+	
+	/**
+	 * Returns the position in an array of nibble values where the sign is expected to be.
+	 * @param decimalType The type of decimal storage style.
+	 * @param byteArrayLength The length of the array of nibbles
+	 * @return Returns the index where the sign nibble is expected to be.
+	 */
+	private static final int signPositionByType(int decimalType, int byteArrayLength) {
+		switch(decimalType) {
+		case EBCDIC_SIGN_EMBEDDED_TRAILING:
+			return byteArrayLength - 1;
+		case EBCDIC_SIGN_EMBEDDED_LEADING:
+			return 0;
+		case EBCDIC_SIGN_SEPARATE_TRAILING:
+			return byteArrayLength - 1;
+		case EBCDIC_SIGN_SEPARATE_LEADING:
+			return 0;
+		default:
+			throw new IllegalArgumentException();
+				
 		}
 	}
 

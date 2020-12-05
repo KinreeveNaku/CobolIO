@@ -26,17 +26,21 @@ public class EnhancedCopybook {
 	private static final String PERIOD = ".";
 	private final Copybook cpy;
 	private final int length;
-	private final transient LinkedHashMap<String, EnhancedItem> classVariables;// Relying on Items referenced by their path should
-																// noticeably improve the performance of behaviors such
-																// as field concatenation, redefines, occurs, occurs
-																// depending, etc. by being able to look up fields or
-																// their parents directly rather than recursively.
+	private transient int index = 0;
+	private final transient LinkedHashMap<String, EnhancedItem> classVariables;// Relying on Items referenced by their
+																				// path should
 
-	
+	// noticeably improve the performance of behaviors such
+	// as field concatenation, redefines, occurs, occurs
+	// depending, etc. by being able to look up fields or
+	// their parents directly rather than recursively.
+
 	public EnhancedCopybook(Copybook cpy) {
 		if (cpy == null || cpy.getItems().isEmpty()) {// Defensive
 			throw new NullPointerException(
 					"The copybook cannot be null and must have some kind of internal structure.");
+		} else if (cpy.getItems().size() == 1 && !cpy.getItems().get(0).getItems().isEmpty()) {
+			// Remove level 0 field definition if it is a header field. TODO Is this safe?
 		}
 		this.cpy = cpy;
 		this.classVariables = new LinkedHashMap<>(DEFAULT_MAP_SIZE);// We won't know the field count until after and
@@ -44,23 +48,34 @@ public class EnhancedCopybook {
 																	// relatively high number instead of parsing the
 																	// copybook twice. Especially with larger copybooks.
 		this.length = this.primePaths();
-		
+		for (String itemPath : classVariables.keySet()) {
+			System.out.println(itemPath);
+		}
 	}
 
 	public Copybook getCopybook() {
 		return this.cpy;
 	}
-	
+
 	public synchronized String getName() {
 		return this.cpy.getFilename();
 	}
-	
+
+	public int getLength() {
+		return length;
+	}
+
 	/**
 	 * Returns an unmodifiable list of the fields in this copybook.
+	 * 
 	 * @return
 	 */
 	public synchronized List<EnhancedItem> getItems() {
 		return Collections.unmodifiableList(this.cpy.getItems());
+	}
+
+	public Map<String, EnhancedItem> getClassVariables() {
+		return Collections.unmodifiableMap(this.classVariables);
 	}
 
 	/**
@@ -80,12 +95,15 @@ public class EnhancedCopybook {
 			throw new IllegalStateException("The copybook cannot be null");
 		}
 		int len = 0;
-		for (EnhancedItem enhancedItem : cpy.getItems()) {
-			enhancedItem.setFieldPath(makePath(cpy.getFilename(), enhancedItem.getName()));
+		for (EnhancedItem enhancedItem : cpy.getItems()) {//for each level 1
+			enhancedItem.setFieldPath(enhancedItem.getName());
 			if (enhancedItem.getItems() != null && !enhancedItem.getItems().isEmpty()) {
-				for(EnhancedItem x : enhancedItem.getItems()) {
-					len += primePaths(x, cpy.getFilename(), len);//add the total length of each Item to the total length.
-					this.classVariables.put(x.getFieldPath(), x);
+				for (EnhancedItem x : enhancedItem.getItems()) {//for each > level 1 TODO Add in handling for children elements and ignore the parent
+					if (!"true".equals(enhancedItem.getRedefined())) {
+						len += primePaths(x, enhancedItem.getName(), len);// add the total length of each Item to the total
+																		// length.
+						this.classVariables.put(x.getFieldPath(), x);
+					}
 				}
 			}
 		}
@@ -94,19 +112,24 @@ public class EnhancedCopybook {
 
 	private int primePaths(EnhancedItem enhancedItem, String parentPath, int len) {
 		formPath(enhancedItem, parentPath);
+		enhancedItem.setIndex(index);
+		this.index++;
 		if (enhancedItem.getItems() != null && !enhancedItem.getItems().isEmpty()) {
-			for(EnhancedItem x : enhancedItem.getItems()) {
+			for (EnhancedItem x : enhancedItem.getItems()) {
 				formPath(enhancedItem, parentPath);
+
 				this.classVariables.put(x.getFieldPath(), x);
+
 			}
 		} else {
-			len += enhancedItem.getDisplayLength();//add the length of this item to the length of the current context.
+			len += enhancedItem.getDisplayLength();// add the length of this item to the length of the current context.
 		}
 		return len;
 	}
 
 	private static void formPath(EnhancedItem enhancedItem, String parentPath) {
 		enhancedItem.setFieldPath(makePath(parentPath, enhancedItem.getName()));
+
 	}
 
 	/**
@@ -118,11 +141,4 @@ public class EnhancedCopybook {
 		return parentPath.concat(PERIOD.concat(name));
 	}
 
-	public int getLength() {
-		return length;
-	}
-	
-	public Map<String, EnhancedItem> getClassVariables() {
-		return Collections.unmodifiableMap(this.classVariables);
-	}
 }

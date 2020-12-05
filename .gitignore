@@ -1,9 +1,10 @@
 .settings
 target
-.classpath
-.project
-.iml
-.ipl
+.*
+!.gitignore
+!.github
+
+sonar-project.properties
 doc
 src/main/java/com/github/mfds2j/**
 src/main/java/net/sf/**
@@ -18,5 +19,8 @@ dependencies/*.*
 /dependencies/MicroFocus
 /dependencies/recgen
 src/main/java/com/*.java
-src/main/java/com/ibm/*
-src/main/java/com/microfocus/*
+src/main/java/com/ibm/**
+src/main/java/com/microfocus/**
+src/test/resources/*.json
+src/test/resources/*.xml
+src/test/resources/*.java

@@ -12,6 +12,8 @@ import java.math.BigDecimal;
  */
 @SuppressWarnings("serial")
 public abstract class CobolNumber extends Number {// Should this be an interface?
+	private int scale;
+	private int precision;
 	private boolean isSigned;
 
 	protected CobolNumber(boolean isSigned) {
